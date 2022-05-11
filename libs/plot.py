@@ -2,9 +2,11 @@
 
 import cartopy.crs as ccrs
 import cftime
+import libs.helpers as helpers
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import xarray
 
 
 def monthly_variability(
@@ -33,19 +35,81 @@ def monthly_variability(
     '''
     fig, ax = plt.subplots(figsize=(21, 6))
     fig.suptitle(title)
+    yrange != None and ax.set_ylim(*yrange)
+    monthly_variability_subplot(data, ax, '', ylabel)
+    ax.legend(loc='best')
+
+
+def monthly_variability_regional(data, title, ylabel, process=lambda x: x, ylim=None):
+    '''
+    Function: monthly_variability_regional()
+        Mask data to nsidc regions and plot monthly variability
+
+    Inputs:
+    - data (xarray): data to process and plot
+    - title (string): axis title
+    - ylabel (string): y-axis label
+    - process (function): process data before plotting
+        default: lambda x: x
+    - ylim (array): y-axis range
+        e.g. [0, 5]
+        default: None
+
+    Outputs: None
+
+    TODO:
+    - color
+    - automate ylim
+    - legend below subplots?
+    '''
+    regions = helpers.nsidc_regions()
+    path_nsidc_mask = '_data/_cache/NSIDC_Regions_Masks_LatLon_nearest_s2d.nc'
+    nsidc_mask = xarray.open_mfdataset(paths=path_nsidc_mask, combine='by_coords').mask
+    nsidc_mask = nsidc_mask.roll(x=96, roll_coords=True)
+
+    fig, axs = plt.subplots(3, 3, figsize=(15, 15))
+    axs = axs.flatten()
+    fig.suptitle(title)
+
+    for i, region in enumerate(regions[1:]):
+        data_masked = data.copy().where(np.isin(nsidc_mask.values, region['values']))
+        data_masked = process(data_masked)
+        ax = axs[i]
+        monthly_variability_subplot(data_masked, ax, region['label'], ylabel)
+        i == 0 and ax.legend(loc='best')
+
+    fig.tight_layout()
+    ylim != None and plt.setp(axs, ylim=ylim)
+
+
+def monthly_variability_subplot(data, ax, title, ylabel):
+    '''
+    Function: monthly_variability_subplot()
+        Plot an array of data on a given axis with
+        monthly averages on a single figure
+
+    Inputs:
+    - data (array): array of time series data to plot
+        format: [{ 'data': (xarray), 'label': (string) }]
+    - ax (matplotlib.pyplot.axis): axis on which to plot
+    - title (string): axis title
+    - ylabel (string): y-axis label
+
+    Outputs: None
+
+    TODO:
+    - color
+    '''
     for i, item in enumerate(data):
         item['data'].plot(ax=ax, label=item['label']) #, color=color)
 
     ax.grid()
     ax.set_xlim(1, 12)
-    yrange != None and ax.set_ylim(*yrange)
-    
     months = np.arange(1, 13)
     month_ticks = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
     ax.set_xticks(months, month_ticks)
-    ax.legend(loc='best') 
     ax.set(xlabel='Month', ylabel=ylabel)
-    ax.set_title('')
+    ax.set_title(title)
 
 
 def nstereo(
