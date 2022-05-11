@@ -6,3 +6,5 @@ __pycache__/
 .DS_Store
 
 _data/cmip6/
+_data/_cache/*
+!_data/_cache/.gitignore
