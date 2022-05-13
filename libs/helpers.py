@@ -104,21 +104,26 @@ def get_data(
     return xarray.open_mfdataset(paths=files, combine='by_coords')
 
 
-def monthly_means_time(data):
+def monthly_means_time(data, weight, dim=None):
     '''
     Function: monthly_means_time()
         Create an array of sliced data which has each been sliced to a
-        year range, averaged spatially (lat,lon) and monthly averages taken
+        year range, averaged spatially over specified dims and a monthly
+        mean taken
     
     Inputs:
     - data (xarray): data to slice and process
+    - weight (xarray): array to weight data against (e.g. areacella)
+    - dim (tuple): custom dimensions to average over
+        e.g. ('i', 'j') for ocean, ('lat', 'lon') for atmos
+        default: None (all weighted dimensions averaged)
     
     Outputs:
     - (array): slices
         format: [
-            { 'data': (data), 'label': '2015-2035' },
-            { 'data': (data), 'label': '2040-2060' },
-            { 'data': (data), 'label': '2080-2100' }
+            { 'data': (xarray), 'label': '2015-2035' },
+            { 'data': (xarray), 'label': '2040-2060' },
+            { 'data': (xarray), 'label': '2080-2100' }
         ]
     
     TODO:
@@ -128,12 +133,53 @@ def monthly_means_time(data):
     
     for i, item in enumerate(slices):
         data = item['data']
-        
-        slices[i]['data'] = weighted(data)\
-            .mean(dim=('lat', 'lon'), skipna=True)\
+        data_weighted = data.weighted(weight)
+        data_dim = dim if dim != None else data_weighted.weights.coords
+
+        slices[i]['data'] = data_weighted\
+            .mean(dim=data_dim, skipna=True)\
             .groupby('time.month')\
             .mean('time')
         
+    return slices
+
+
+def monthly_sums_time(data, weight, dim=None):
+    '''
+    Function: monthly_sums_time()
+        Create an array of sliced data which has each been sliced to a
+        year range, applied area weighting and summed over spatial dims
+
+    Inputs:
+    - data (xarray): data to slice and process
+    - weight (xarray): array to weight data against (e.g. areacella)
+    - dim (tuple): custom dimensions to sum over
+        e.g. ('i', 'j') for ocean, ('lat', 'lon') for atmos
+        default: None (all weighted dimensions summed)
+
+    Outputs:
+    - (array): slices
+        format: [
+            { 'data': (xarray), 'label': '2015-2035' },
+            { 'data': (xarray), 'label': '2040-2060' },
+            { 'data': (xarray), 'label': '2080-2100' }
+        ]
+
+    TODO:
+    - change first to 1980-2010
+    '''
+    slices = default_slices(data)
+
+    for i, item in enumerate(slices):
+        data = item['data']
+        data_weighted = data.weighted(weight)
+        data_dim = dim if dim != None else data_weighted.weights.coords
+
+        slices[i]['data'] = data_weighted\
+            .sum(dim=data_dim, skipna=True)\
+            .groupby('time.month')\
+            .mean('time')
+
     return slices
 
 
