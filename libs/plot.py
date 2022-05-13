@@ -40,7 +40,14 @@ def monthly_variability(
     ax.legend(loc='best')
 
 
-def monthly_variability_regional(data, title, ylabel, process=lambda x: x, ylim=None):
+def monthly_variability_regional(
+    data,
+    title,
+    ylabel,
+    mask_type='latlon',
+    process=lambda x: x,
+    ylim=None
+):
     '''
     Function: monthly_variability_regional()
         Mask data to nsidc regions and plot monthly variability
@@ -64,8 +71,13 @@ def monthly_variability_regional(data, title, ylabel, process=lambda x: x, ylim=
     '''
     regions = helpers.nsidc_regions()
     path_nsidc_mask = '_data/_cache/NSIDC_Regions_Masks_LatLon_nearest_s2d.nc'
+    if mask_type == 'ocean':
+        path_nsidc_mask = '_data/_cache/NSIDC_Regions_Masks_Ocean_nearest_s2d.nc'
+
     nsidc_mask = xarray.open_mfdataset(paths=path_nsidc_mask, combine='by_coords').mask
-    nsidc_mask = nsidc_mask.roll(x=96, roll_coords=True)
+
+    if mask_type == 'latlon':
+        nsidc_mask = nsidc_mask.roll(x=96, roll_coords=True)
 
     fig, axs = plt.subplots(3, 3, figsize=(15, 15))
     axs = axs.flatten()
