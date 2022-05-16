@@ -104,6 +104,37 @@ def get_data(
     return xarray.open_mfdataset(paths=files, combine='by_coords')
 
 
+def monthly_means_spatial(data, month):
+    '''
+    Function: monthly_means_spatial()
+        Create an array of sliced data which has each been sliced to a
+        year range and a monthly average taken
+
+    Inputs:
+    - data (xarray): data to slice and process
+    - month (string): month to average over
+
+    Outputs:
+    - (array): slices
+        format: [
+            { 'data': (data), 'label': '2015-2035' },
+            { 'data': (data), 'label': '2040-2060' },
+            { 'data': (data), 'label': '2080-2100' }
+        ]
+
+    TODO:
+    - change first to 1980-2010
+    '''
+    slices = default_slices(data)
+
+    for i, item in enumerate(slices):
+        slices[i]['data'] = item['data']\
+            .where(item['data'].time['time.month'] == month)\
+            .mean(dim=('time'), skipna=True)
+
+    return slices
+
+
 def monthly_means_time(data, weight, dim=None):
     '''
     Function: monthly_means_time()
