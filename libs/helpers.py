@@ -134,7 +134,7 @@ def monthly_means_time(data, weight, dim=None):
     for i, item in enumerate(slices):
         data = item['data']
         data_weighted = data.weighted(weight)
-        data_dim = dim if dim != None else data_weighted.weights.coords
+        data_dim = dim if dim != None else data_weighted.weights.dims
 
         slices[i]['data'] = data_weighted\
             .mean(dim=data_dim, skipna=True)\
@@ -173,7 +173,7 @@ def monthly_sums_time(data, weight, dim=None):
     for i, item in enumerate(slices):
         data = item['data']
         data_weighted = data.weighted(weight)
-        data_dim = dim if dim != None else data_weighted.weights.coords
+        data_dim = dim if dim != None else data_weighted.weights.dims
 
         slices[i]['data'] = data_weighted\
             .sum(dim=data_dim, skipna=True)\
