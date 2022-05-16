@@ -126,7 +126,7 @@ def monthly_variability_subplot(data, ax, title, ylabel):
 
 def nstereo(
     arr, 
-    title, 
+    title,
     colorbar_label, 
     colormesh_kwargs
 ):
@@ -145,7 +145,9 @@ def nstereo(
             'cmap': 'PuBu',
             'extend': 'max', # ['min', 'both']
             'vmin': 0,
-            'vmax': 1
+            'vmax': 1,
+            'x': 'longitude',
+            'y': 'latitude'
         }
         See:
         - https://xarray.pydata.org/en/stable/generated/xarray.plot.pcolormesh.html
@@ -183,8 +185,6 @@ def nstereo(
         subfig = arr[i]['data'].plot.pcolormesh(
             add_colorbar=False,
             ax=ax,
-            levels=21,
-            shading='flat',
             transform=transform,
             **colormesh_kwargs
         )
