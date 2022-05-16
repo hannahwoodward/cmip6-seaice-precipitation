@@ -2,11 +2,65 @@
 
 import cartopy.crs as ccrs
 import cftime
+import datetime
 import libs.helpers as helpers
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray
+
+
+def monthly_spatial(
+    arr,
+    colormesh_kwargs,
+    units,
+    months=['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
+    title=''
+):
+    '''
+    Function: monthly_spatial()
+        Calculate monthly means for time slices and plot on a north stereographic
+        projection (60-90N)
+
+    Inputs:
+    - arr (array): array of data to plot
+        format: [{ 'data': (xarray), 'label': (string) }]
+    - colormesh_kwargs (dict): kwargs to pass to pcolormesh
+        e.g.
+        {
+            'cmap': 'PuBu',
+            'extend': 'max', # ['min', 'both']
+            'vmin': 0,
+            'vmax': 1,
+            'x': 'longitude',
+            'y': 'latitude'
+        }
+        See:
+        - https://xarray.pydata.org/en/stable/generated/xarray.plot.pcolormesh.html
+        - https://matplotlib.org/stable/gallery/color/colormap_reference.html
+    - units (string): units to add to title and colorbar label
+    - months (array): array of months (in abbreviated format '%b') to plot
+        default: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
+                  'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+    - title (string): title of plot, will be formatted with m, label, units
+        e.g. '{m} SSP585 {label} 60-90°N ({units})'
+        default: ''
+
+    Outputs: None
+    '''
+    for m in months:
+        m_index = datetime.datetime.strptime(m, '%b').month
+
+        for item in arr:
+            data_mod = helpers.monthly_means_spatial(item['data'].copy(), m_index)
+            label = item['label']
+
+            nstereo(
+                data_mod,
+                title=title.format(m=m, label=label.lower(), units=units),
+                colorbar_label=f'{label} ({units})',
+                colormesh_kwargs=colormesh_kwargs
+            )
 
 
 def monthly_variability(
@@ -202,6 +256,56 @@ def nstereo(
         pad=0.05,
         shrink=0.5
     )
+
+
+def seasonal_spatial(
+    arr,
+    colormesh_kwargs,
+    units,
+    seasons=['DJF', 'MAM', 'JJA', 'SON'],
+    title=''
+):
+    '''
+    Function: seasonal_spatial()
+        Calculate seasonal means for time slices and plot on a north stereographic
+        projection (60-90N)
+
+    Inputs:
+    - arr (array): array of data to plot
+        format: [{ 'data': (xarray), 'label': (string) }]
+    - colormesh_kwargs (dict): kwargs to pass to pcolormesh
+        e.g.
+        {
+            'cmap': 'PuBu',
+            'extend': 'max', # ['min', 'both']
+            'vmin': 0,
+            'vmax': 1,
+            'x': 'longitude',
+            'y': 'latitude'
+        }
+        See:
+        - https://xarray.pydata.org/en/stable/generated/xarray.plot.pcolormesh.html
+        - https://matplotlib.org/stable/gallery/color/colormap_reference.html
+    - units (string): units to add to title and colorbar label
+    - seasons (array): array of seasons to plot
+        default: ['DJF', 'MAM', 'JJA', 'SON']
+    - title (string): title of plot, will be formatted with s, label, units
+        e.g. '{s} SSP585 {label} 60-90°N ({units})'
+        default: ''
+
+    Outputs: None
+    '''
+    for s in seasons:
+        for item in arr:
+            data_mod = helpers.seasonal_means_spatial(item['data'].copy(), s)
+            label = item['label']
+
+            nstereo(
+                data_mod,
+                title=title.format(s=s, label=label.lower(), units=units),
+                colorbar_label=f'{label} ({units})',
+                colormesh_kwargs=colormesh_kwargs
+            )
 
 
 def time_series(
