@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import os
-import regionmask
 import urllib
 import xarray
 
@@ -281,30 +280,3 @@ def smoothed_mean(data, time=60):
     - (xarray): smoothed data
     '''
     return data.rolling(time=time, center=True).mean(dim=('month'))
-
-
-def weighted(data, region=None):
-    '''
-    Function: weighted()
-        Create weighted data to lat-lon, 
-        e.g. for taking spatial sum or mean
-    
-    Inputs:
-    - data (xarray): data to slice and process
-    - region (string): mask to regionmask region
-        default: None
-    
-    Outputs:
-    - (xarray): weighted data
-    '''
-    # Copy metadata from first time-step
-    w = data[0, :, :] 
-    w = np.cos(np.deg2rad(data.lat))
-    w.name = 'weights'
-
-    # TODO: multiple regions
-    if region:
-        mask = regionmask.defined_regions.ar6.all.mask(data[0, :, :])
-        w = w.where(mask == region, 0) 
-
-    return data.weighted(w)
