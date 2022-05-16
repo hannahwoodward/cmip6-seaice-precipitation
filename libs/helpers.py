@@ -134,7 +134,7 @@ def monthly_means_spatial(data, month):
     return slices
 
 
-def monthly_means_time(data, weight, dim=None):
+def monthly_means_time(data, weight, dim=None, fillna=False):
     '''
     Function: monthly_means_time()
         Create an array of sliced data which has each been sliced to a
@@ -147,6 +147,8 @@ def monthly_means_time(data, weight, dim=None):
     - dim (tuple): custom dimensions to average over
         e.g. ('i', 'j') for ocean, ('lat', 'lon') for atmos
         default: None (all weighted dimensions averaged)
+    - fillna (bool): whether to fill any NaN values in the final
+        time series with zero
     
     Outputs:
     - (array): slices
@@ -171,6 +173,9 @@ def monthly_means_time(data, weight, dim=None):
             .groupby('time.month')\
             .mean('time')
         
+        if fillna:
+            slices[i]['data'] = slices[i]['data'].fillna(0)
+
     return slices
 
 
