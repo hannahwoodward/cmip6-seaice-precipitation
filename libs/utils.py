@@ -147,7 +147,7 @@ def download_variable(
         merged_array = merged_array.chunk()
         print('   -> Merged')
 
-        # Set time coord to 360_day and set encoding if merging
+        # Set time coord to 360_day and set encoding if merging and monthly data
         if 'time' in merged_array:
             if len(local_filenames) > 1:
                 first_file = xarray.open_mfdataset(
@@ -160,9 +160,12 @@ def download_variable(
                 merged_array.time.encoding['calendar'] = first_file.time.encoding['calendar']
                 print('   -> Set time encoding')
 
-            if first_file.time.encoding['calendar'] != '360_day':
+            if merged_array.time.encoding['calendar'] != '360_day' and frequency == 'mon':
                 merged_array = convert_to_360_day(merged_array)
                 print('   -> Converted calendar to 360_day')
+
+            # Select slice
+            merged_array = merged_array.sel(time=slice('2015-01-01', '2101-01-01'))
 
         # Perform regridding
         if regrid_kwargs != None:
