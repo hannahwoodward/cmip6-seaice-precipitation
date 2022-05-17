@@ -11,14 +11,15 @@ def ensemble():
             'experiment_id': 'ssp585',
             'source_id': 'NorESM2-LM',
             'variant_label': 'r1i1p1f1',
-        }, {
-            'experiment_id': 'ssp585',
-            'source_id': 'CESM2-WACCM',
-            'variant_label': 'r4i1p1f1',
-        }, {
-            'experiment_id': 'ssp585',
-            'source_id': 'CESM2',
-            'variant_label': 'r4i1p1f1',
+        # }, {
+        # NB currently status 404
+        #    'experiment_id': 'ssp585',
+        #    'source_id': 'CESM2-WACCM',
+        #    'variant_label': 'r4i1p1f1',
+        #}, {
+        #    'experiment_id': 'ssp585',
+        #    'source_id': 'CESM2',
+        #   'variant_label': 'r4i1p1f1',
         }, {
             # missing: sipr, dynamics, frazil, lateral melt, evapsubl
             'experiment_id': 'ssp585',
@@ -34,6 +35,7 @@ def ensemble():
             'source_id': 'ACCESS-CM2',
             'variant_label': 'r1i1p1f1',
         }
+        # NB currently status 500
         #, {
         #    # missing: sipr, No explicit lateral melt
         #    'experiment_id': 'ssp585',
