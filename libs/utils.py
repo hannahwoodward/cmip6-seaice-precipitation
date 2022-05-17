@@ -184,6 +184,7 @@ def download_variable(
 
         if combined_path.exists() and not force_write:
             print('   -> Processed file already exists, skipping write')
+            merged_array.close()
             return
 
         # Write to file
@@ -196,6 +197,7 @@ def download_variable(
         with ProgressBar():
             write.compute()
 
+        merged_array.close()
         print('   -> Saved')
         return
 
