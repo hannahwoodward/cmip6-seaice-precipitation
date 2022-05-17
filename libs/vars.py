@@ -4,6 +4,7 @@
 def ensemble():
     return [
         {
+            'areacello_variant_label': 'r1i1p1f2',
             'experiment_id': 'ssp585',
             'source_id': 'UKESM1-0-LL',
             'variant_label': 'r2i1p1f2',
