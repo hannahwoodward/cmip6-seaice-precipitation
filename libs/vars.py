@@ -33,10 +33,11 @@ def ensemble():
             'experiment_id': 'ssp585',
             'source_id': 'ACCESS-CM2',
             'variant_label': 'r1i1p1f1',
-        }, {
-            # missing: sipr, No explicit lateral melt
-            'experiment_id': 'ssp585',
-            'source_id': 'GFDL-ESM4',
-            'variant_label': 'r1i1p1f1'
         }
+        #, {
+        #    # missing: sipr, No explicit lateral melt
+        #    'experiment_id': 'ssp585',
+        #    'source_id': 'GFDL-ESM4',
+        #    'variant_label': 'r1i1p1f1'
+        #}
     ]
