@@ -34,6 +34,7 @@ def download_variable(
     grid_label='gn',
     variant_label=None,
     process_files=False,
+    regrid_kwargs=None,
     save_to_local=False
 ):
     '''
@@ -42,16 +43,29 @@ def download_variable(
         `https://esgf-index1.ceda.ac.uk/search/cmip6-ceda/`
 
     Inputs:
+    (used in ceda query):
     - experiment_id (string): model experiment, e.g. 'historical', 'ssp585'
     - source_id (string): model source, e.g. 'UKESM1-0-LL'
     - variable_id (string): variable, e.g. 'pr'
     - variant_id (string): model realisation, e.g. 'r2i1p1f2'
-    - frequency (string):
-    - grid_label (string):
-    - process_files (bool):
-    - save_to_local (bool):
+    - frequency (string): frequency to query, e.g. 'mon'
+        default: None
+    - grid_label (string): grid label to query, e.g. 'gn', 'gr'
+        default: 'gn'
 
-    TODO: regrid
+    (for processing):
+    - process_files (bool): whether to merge multiple files, remap time
+        to cftime 360_day, and regrid using regrid_kwargs (if specified)
+        default: False
+    - regrid_kwargs (dict): kwargs for libs.utils.regrid() if process_files
+        is True, e.g.
+        {
+            'grid': target_grid,
+            'extrap_method': 'nearest_s2d'
+        }
+        default: None
+    - save_to_local (bool): whether to download files to local
+        default: False
     '''
     base_url = 'https://esgf-index1.ceda.ac.uk/esg-search/search/'
     query = {
@@ -117,6 +131,7 @@ def download_variable(
 
         if not process_files or len(local_filenames) == 0:
             continue
+        print('-> Processing:')
 
         # Create merged array from files
         merged_array = xarray.open_mfdataset(
@@ -126,6 +141,7 @@ def download_variable(
             use_cftime=True
         )
         merged_array = merged_array.chunk()
+        print('   -> Merged')
 
         # Set time coord to 360_day and set encoding if merging
         if 'time' in merged_array:
@@ -138,9 +154,16 @@ def download_variable(
                 )
                 merged_array.time.encoding['units'] = first_file.time.encoding['units']
                 merged_array.time.encoding['calendar'] = first_file.time.encoding['calendar']
+                print('   -> Set time encoding')
 
             if first_file.time.encoding['calendar'] != '360_day':
                 merged_array = convert_to_360_day(merged_array)
+                print('   -> Converted calendar to 360_day')
+
+        # Perform regridding
+        if regrid_kwargs != None:
+            merged_array = libs.utils.regrid(merged_array, **regrid_kwargs)
+            print('   -> Regridded')
 
         # Generate new filename with updated date ranges
         merged_array_dates = merged_array[variable_id].time.values
