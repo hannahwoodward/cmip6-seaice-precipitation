@@ -33,6 +33,7 @@ def download_variable(
     frequency=None,
     grid_label='gn',
     variant_label=None,
+    force_write=False,
     process_files=False,
     regrid_kwargs=None,
     save_to_local=False
@@ -54,6 +55,9 @@ def download_variable(
         default: 'gn'
 
     (for processing):
+    - force_write (bool): whether to force write the resulting processed file
+        (i.e. force_write will overrwrite an already existing file)
+        default: False
     - process_files (bool): whether to merge multiple files, remap time
         to cftime 360_day, and regrid using regrid_kwargs (if specified)
         default: False
@@ -131,8 +135,8 @@ def download_variable(
 
         if not process_files or len(local_filenames) == 0:
             continue
-        print('-> Processing:')
 
+        print('-> Processing:')
         # Create merged array from files
         merged_array = xarray.open_mfdataset(
             paths=local_filenames, 
@@ -174,6 +178,10 @@ def download_variable(
         filename_split.append(f'{date_start}-{date_end}') # Add new date range
         combined_filename = '_'.join(filename_split) + '_processed.nc'
         combined_path = Path(item_local_path, combined_filename)
+
+        if combined_path.exists() and not force_write:
+            print('   -> Processed file already exists, skipping write')
+            return
 
         # Write to file
         print(f'   -> Writing to {combined_path}')
@@ -238,7 +246,6 @@ def download_remote_files(item, local_path, headers):
         print(f'   -> Downloading:')
         print(f'   -> {file_url}')
         print(f'   -> {local_filename}')
-        #file_req = urllib.request.Request(file_url, headers=headers)
         file_response = urllib.request.urlretrieve(
             file_url,
             local_filename
