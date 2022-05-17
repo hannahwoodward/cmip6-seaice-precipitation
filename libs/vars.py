@@ -41,3 +41,25 @@ def ensemble():
         #    'variant_label': 'r1i1p1f1'
         #}
     ]
+
+
+def nsidc_regions():
+    '''
+    Function: nsidc_regions()
+        Retrieve nsidc region mask values
+
+        See:
+        - https://github.com/CPOMUCL/CMIP6_data/blob/main/CMIP6_open_processed.ipynb
+    '''
+    return [
+        { 'values': [6,7,8,9,10,11,12,13,15], 'label': 'All' },
+        { 'values': [6], 'label': 'Labrador' },
+        { 'values': [7], 'label': 'Greenland' },
+        { 'values': [8], 'label': 'Barents' },
+        { 'values': [9], 'label': 'Kara' },
+        { 'values': [10], 'label': 'Siberian' },
+        { 'values': [11], 'label': 'Laptev' },
+        { 'values': [12], 'label': 'Chukchi' },
+        { 'values': [13], 'label': 'Beaufort' },
+        { 'values': [15], 'label': 'Central' },
+    ]

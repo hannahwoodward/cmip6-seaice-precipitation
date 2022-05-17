@@ -9,10 +9,10 @@ def default_slices(data):
     '''
     Function: default_slices()
         Create an array of data slices for analysis
-    
+
     Inputs:
     - data (xarray): data to slice
-    
+
     Outputs:
     - (array): slices
         format: [
@@ -20,11 +20,11 @@ def default_slices(data):
             { 'data': data.sel(time=slice('2040-01-01', '2061-01-01')), 'label': '2040-2060' },
             { 'data': data.sel(time=slice('2080-01-01', '2101-01-01')), 'label': '2080-2100' }
         ]
-    
+
     TODO:
     - change first to 1980-2010
     '''
-    
+
     return [
         { 'data': data.sel(time=slice('2015-01-01', '2036-01-01')), 'label': '2015-2035' },
         { 'data': data.sel(time=slice('2040-01-01', '2061-01-01')), 'label': '2040-2060' },
@@ -88,7 +88,7 @@ def get_data(
         e_id = experiment_ids[i]
         
         filename = f'{var}_{component}_UKESM1-0-LL_{e_id}_{variant_id}_gn_{y}.nc'
-        local_file = f'_data/cmip6/UKESM1/{filename}'
+        local_file = f'_data/cmip6/UKESM1-0-LL/{filename}'
         
         verbose and print(f'Loading {filename}')
         if not os.path.exists(local_file):
@@ -218,38 +218,16 @@ def monthly_sums_time(data, weight, dim=None):
     return slices
 
 
-def nsidc_regions():
-    '''
-    Function: nsidc_regions()
-        Retrieve nsidc region mask values
-
-        See:
-        - https://github.com/CPOMUCL/CMIP6_data/blob/main/CMIP6_open_processed.ipynb
-    '''
-    return [
-        { 'values': [6,7,8,9,10,11,12,13,15], 'label': 'All' },
-        { 'values': [6], 'label': 'Labrador' },
-        { 'values': [7], 'label': 'Greenland' },
-        { 'values': [8], 'label': 'Barents' },
-        { 'values': [9], 'label': 'Kara' },
-        { 'values': [10], 'label': 'Siberian' },
-        { 'values': [11], 'label': 'Laptev' },
-        { 'values': [12], 'label': 'Chukchi' },
-        { 'values': [13], 'label': 'Beaufort' },
-        { 'values': [15], 'label': 'Central' },
-    ]
-
-
 def seasonal_means_spatial(data, season):
     '''
     Function: seasonal_means_spatial()
         Create an array of sliced data which has each been sliced to a
         year range and a seasonal average taken
-    
+
     Inputs:
     - data (xarray): data to slice and process
     - season (string): season to average over [DJF, MAM, JJA, SON]
-    
+
     Outputs:
     - (array): slices
         format: [
@@ -257,17 +235,17 @@ def seasonal_means_spatial(data, season):
             { 'data': (data), 'label': '2040-2060' },
             { 'data': (data), 'label': '2080-2100' }
         ]
-    
+
     TODO:
     - change first to 1980-2010
     '''
     slices = default_slices(data)
-  
+
     for i, item in enumerate(slices):
         slices[i]['data'] = item['data']\
             .where(item['data'].time['time.season'] == season)\
             .mean(dim=('time'), skipna=True)
-        
+
     return slices
 
 
@@ -275,12 +253,12 @@ def smoothed_mean(data, time=60):
     '''
     Function: smoothed_mean()
         Smooth data over rolling window
-    
+
     Inputs:
     - data (xarray): data to smooth
     - time (int): length of rolling window, in months
         default: 60 (i.e. 5 years)
-    
+
     Outputs:
     - (xarray): smoothed data
     '''
