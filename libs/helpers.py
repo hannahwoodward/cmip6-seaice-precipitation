@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-import os
-import urllib
 import xarray
 
 
@@ -32,75 +30,17 @@ def default_slices(data):
     ]
 
 
-def get_data(
-    experiment_id, 
-    component, 
-    var,
-    variant_id,
-    verbose=False,
-    add_historical=False
-):
-    '''
-    Function: get_data()
-        Load a UKESM1 output variable from a local path with xarray.
-        Format:
-            '_data/cmip6/UKESM1/{var}_{component}_UKESM1-0-LL_{e_id}_{variant_id}_gn_{y}.nc'
-    
-    Inputs:
-    - experiment_id (string): model experiment
-        e.g. 'historical', 'ssp585'
-    - component (string): model components
-        e.g. 'Amon'
-    - var (string): variable
-        e.g. 'pr'
-    - variant_id (string): model realisation
-        e.g. 'r2i1p1f2'
-    - verbose (bool): whether to output loading/errors
-        default: False
-    - add_historical (bool): whether to prepend historical runs to data
-        default: False
-    
-    Outputs:
-    - (xarray): loaded data
-    
-    TODO:
-    - custom model [e.g. UKESM1-0-LL]
-    - custom path?
-    - remote download?
-    '''
-    
-    # Ensure `_data` dir exists
-    os.makedirs('_data', exist_ok=True)
-    os.makedirs('_data/cmip6', exist_ok=True)
-    
-    # Set year ranges 
-    years = ['201501-204912', '205001-210012']
-    experiment_ids = [experiment_id, experiment_id]
-    if experiment_id == 'historical':
-        years = ['185001-194912', '195001-201412']
-    elif add_historical:
-        years[:0] = ['185001-194912', '195001-201412']
-        experiment_ids[:0] = ['historical', 'historical']
+def ensemble_mean(arr):
+    data = arr[0]['data'].copy()
+    for item in arr[1:]:
+        data += item['data']
 
-    # Gather relevant files
-    files = []
-    for i, y in enumerate(years):
-        e_id = experiment_ids[i]
-        
-        filename = f'{var}_{component}_UKESM1-0-LL_{e_id}_{variant_id}_gn_{y}.nc'
-        local_file = f'_data/cmip6/UKESM1-0-LL/{filename}'
-        
-        verbose and print(f'Loading {filename}')
-        if not os.path.exists(local_file):
-            verbose and print(f'-> Error 404. Exiting.')            
-            #filepath = f'{base_url}/{ssp}/{component}/{var}/gn/{v}/{filename}'
-            #urllib.request.urlretrieve(filepath, local_file)
-            return None
+    data /= len(arr)
 
-        files.append(local_file)
-
-    # Merge into single xarray & return
-    return xarray.open_mfdataset(paths=files, combine='by_coords')
+    return {
+        'data': data,
+        'label': 'Ensemble mean'
+    }
 
 
 def monthly_means_spatial(data, month):
