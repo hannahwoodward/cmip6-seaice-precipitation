@@ -1,6 +1,9 @@
+from dask.diagnostics import ProgressBar
+from pathlib import Path
 import cftime
 import json
-from pathlib import Path
+import libs.utils
+import netCDF4
 import urllib
 import xarray
 import xesmf
@@ -150,9 +153,16 @@ def download_variable(
         combined_path = Path(item_local_path, combined_filename)
 
         # Write to file
-        print(f'Writing to {combined_path}')
-        merged_array.to_netcdf(combined_path)
+        print(f'   -> Writing to {combined_path}')
+        write = merged_array.to_netcdf(
+            combined_path,
+            compute=False,
+            engine='netcdf4'
+        )
+        with ProgressBar():
+            write.compute()
 
+        print('   -> Saved')
         return
 
 
