@@ -184,7 +184,7 @@ def download_variable(
         if combined_path.exists() and not force_write:
             print('   -> Processed file already exists, skipping write')
             merged_array.close()
-            return
+            return combined_path
 
         # Write to file
         print(f'   -> Writing to {combined_path}')
@@ -241,7 +241,7 @@ def download_remote_files(item, local_path, headers):
         filename = urllib.parse.urlparse(file_url).path.split('/')[-1]
         local_filename = Path(local_path, filename)
         local_filename.parent.mkdir(parents=True, exist_ok=True)
-        local_filenames.append(local_filename) 
+        local_filenames.append(str(local_filename))
 
         if local_filename.exists():
             print(f'   -> Already exists, skipping: {local_filename}')
