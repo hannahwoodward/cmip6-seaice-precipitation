@@ -190,15 +190,15 @@ def download_variable(
         print(f'   -> Writing to {combined_path}')
         write = merged_array.to_netcdf(
             combined_path,
-            compute=False,
-            engine='netcdf4'
+            compute=False
+            #, engine='netcdf4'
         )
         with ProgressBar():
             write.compute()
 
         merged_array.close()
         print('   -> Saved')
-        return
+        return combined_path
 
 
 def download_remote_files(item, local_path, headers):
