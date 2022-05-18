@@ -334,6 +334,29 @@ def regrid(
 ):
     regridder = xesmf.Regridder(data, grid, method=method, extrap_method=extrap_method)
     data_regridded = regridder(data)
-    save_file != None and data_regridded.to_netcdf(save_file)
+
+    # Re-add attributes from original data
+    if 'attrs' in data:
+        for k in data.attrs:
+            data_regridded.attrs[k] = data.attrs[k]
+
+        # And for the main variable
+        if 'variable_id' in data.attrs:
+            var = data.attrs['variable_id']
+            for k in data[var].attrs:
+                data_regridded[var].attrs[k] = data[var].attrs[k]
+
+    # Add new grid attribute
+    if 'attrs' in grid and 'grid' in grid.attrs:
+        # Preserve original grid attribute just in case
+        if 'grid' in data_regridded.attrs:
+            data_regridded.attrs['grid_original'] = data_regridded.attrs['grid']
+
+        data_regridded.attrs['grid'] = grid.attrs['grid']
+
+    if save_file != None:
+        write = data_regridded.to_netcdf(save_file, compute=False)
+        with ProgressBar():
+            write.compute()
 
     return data_regridded
