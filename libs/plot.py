@@ -216,7 +216,7 @@ def nstereo(
 
     fig, axs = plt.subplots(
         *shape,
-        figsize=(15, 6),
+        figsize=(15, 6 * shape[0]),
         subplot_kw={ 
             'projection': ccrs.Stereographic(central_latitude=90.0)
         }
@@ -248,9 +248,10 @@ def nstereo(
         ax.set_title(arr[i]['label'])
         subfigs.append(subfig)
     
+    colorbar_ax = axs.ravel().tolist() if len(arr) > 1 else axs
     fig.colorbar(
         subfigs[0],
-        ax=axs.ravel().tolist(),
+        ax=colorbar_ax,
         label=colorbar_label,
         location='bottom',
         pad=0.05,
