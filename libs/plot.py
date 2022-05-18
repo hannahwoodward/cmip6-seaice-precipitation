@@ -316,7 +316,7 @@ def time_series(
     ylabel,
     process=lambda x: x,
     years=np.arange(1980, 2101, 20),
-    yrange=None, 
+    yrange=None
 ):
     '''
     Function: time_series()
