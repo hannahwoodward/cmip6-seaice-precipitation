@@ -2,7 +2,6 @@ from dask.diagnostics import ProgressBar
 from pathlib import Path
 import cftime
 import json
-import libs.utils
 import netCDF4
 import urllib
 import xarray
@@ -169,7 +168,7 @@ def download_variable(
 
         # Perform regridding
         if regrid_kwargs != None:
-            merged_array = libs.utils.regrid(merged_array, **regrid_kwargs)
+            merged_array = regrid(merged_array, **regrid_kwargs)
             print('   -> Regridded')
 
         # Generate new filename with updated date ranges
