@@ -54,6 +54,7 @@ def download_variable(
     variable_id,
     frequency=None,
     grid_label='gn',
+    table_id=None,
     variant_label=None,
     force_write=False,
     process_files=False,
@@ -70,11 +71,14 @@ def download_variable(
     - experiment_id (string): model experiment, e.g. 'historical', 'ssp585'
     - source_id (string): model source, e.g. 'UKESM1-0-LL'
     - variable_id (string): variable, e.g. 'pr'
-    - variant_id (string): model realisation, e.g. 'r2i1p1f2'
     - frequency (string): frequency to query, e.g. 'mon'
         default: None
     - grid_label (string): grid label to query, e.g. 'gn', 'gr'
         default: 'gn'
+    - table_id (string): grid label to query, e.g. 'Amon', 'SImon'
+        default: None
+    - variant_label (string): model realisation, e.g. 'r2i1p1f2'
+        default: None
 
     (for processing):
     - force_write (bool): whether to force write the resulting processed file
@@ -109,6 +113,9 @@ def download_variable(
     }
     if frequency != None:
         query['frequency'] = frequency
+
+    if table_id != None:
+        query['table_id'] = table_id
 
     if variant_label != None:
         query['variant_label'] = variant_label
