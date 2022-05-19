@@ -1,4 +1,5 @@
 from dask.diagnostics import ProgressBar
+from nco import Nco
 from pathlib import Path
 import cftime
 import json
@@ -8,14 +9,36 @@ import xarray
 import xesmf
 
 
+def compress_nc_file(path, output, options=['-7 -L 1']):
+    '''
+    Function compress_nc_file():
+        Compress .nc file using `ncks` via pynco
+        This can also be achieved via command line,
+        e.g. cdo -f nc4c -z zip_9 copy $path $output
+        See:
+            https://github.com/nco/pynco
+            http://nco.sourceforge.net/nco.html
+
+    Inputs:
+        - path (array): path of file to compress
+        - output (string): filepath to write compressed to
+
+    Output:
+        - (string): compressed file path (same as output)
+    '''
+    nco = Nco()
+    nco.ncks(input=str(path), output=str(output), options=options)
+    return output
+
+
 def convert_to_360_day(i):
     o = i.copy()
     o_time = i.time.copy()
     for i, time in enumerate(o_time.values):
         o_time.values[i] = cftime.Datetime360Day(
-            time.year, 
-            time.month, 
-            16, 
+            time.year,
+            time.month,
+            16,
             has_year_zero=time.has_year_zero
         )
 
@@ -39,7 +62,7 @@ def download_variable(
 ):
     '''
     Function: download_variable()
-        Retrieve a CMIP6 model output variable from CEDA 
+        Retrieve a CMIP6 model output variable from CEDA
         `https://esgf-index1.ceda.ac.uk/search/cmip6-ceda/`
 
     Inputs:
@@ -89,7 +112,7 @@ def download_variable(
 
     if variant_label != None:
         query['variant_label'] = variant_label
-    
+
     # Set custom User-Agent headers
     headers = {
         'User-Agent': 'Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11'
@@ -102,7 +125,7 @@ def download_variable(
         response = urllib.request.urlopen(req)
         if response.status < 200 or response.status > 299:
             msg = '\n'.join([
-                f'An error occurred making request:', 
+                f'An error occurred making request:',
                 f'-> URL: {url}',
                 f'-> Status code: {response.status}',
             ])
@@ -136,34 +159,28 @@ def download_variable(
             continue
 
         print('-> Processing:')
-        # Create merged array from files
+
+        # Merge into temp file for further processing
+        # NB this uses ncrcat which preserves original compression
+        merged_file_path = merge_nc_files(local_filenames, f'{item_local_path}/_merged.nc')
+        print('   -> Merged')
+
+        # Open merged file
         merged_array = xarray.open_mfdataset(
-            paths=local_filenames, 
-            combine='by_coords', 
+            paths=merged_file_path,
+            combine='by_coords',
             autoclose=True,
             use_cftime=True
         )
-        merged_array = merged_array.chunk()
-        print('   -> Merged')
 
         # Set time coord to 360_day and set encoding if merging and monthly data
         if 'time' in merged_array:
-            if len(local_filenames) > 1:
-                first_file = xarray.open_mfdataset(
-                    paths=local_filenames[0], 
-                    combine='by_coords', 
-                    autoclose=True,
-                    use_cftime=True
-                )
-                merged_array.time.encoding['units'] = first_file.time.encoding['units']
-                merged_array.time.encoding['calendar'] = first_file.time.encoding['calendar']
-                print('   -> Set time encoding')
-
             if merged_array.time.encoding['calendar'] != '360_day' and frequency == 'mon':
                 merged_array = convert_to_360_day(merged_array)
                 print('   -> Converted calendar to 360_day')
 
             # Select slice
+            # TODO pass in arg?
             merged_array = merged_array.sel(time=slice('2015-01-01', '2101-01-01'))
 
         # Perform regridding
@@ -182,22 +199,33 @@ def download_variable(
         combined_path = Path(item_local_path, combined_filename)
 
         if combined_path.exists() and not force_write:
+            # Cleanup & return
             print('   -> Processed file already exists, skipping write')
             merged_array.close()
+            Path(merged_file_path).unlink()
             return combined_path
 
         # Write to file
         print(f'   -> Writing to {combined_path}')
         write = merged_array.to_netcdf(
             combined_path,
-            compute=False
-            #, engine='netcdf4'
+            compute=False,
+            engine='netcdf4',
+            unlimited_dims=['time']
         )
         with ProgressBar():
             write.compute()
 
         merged_array.close()
-        print('   -> Saved')
+        print('   -> Saved to disk')
+
+        # Finally, compress as to_netcdf() seems to produce large file sizes
+        combined_path = compress_nc_file(combined_path, combined_path)
+        print('   -> Compressed')
+
+        # Delete temporary _merged.nc
+        Path(merged_file_path).unlink()
+
         return combined_path
 
 
@@ -222,7 +250,7 @@ def download_remote_files(item, local_path, headers):
     response = urllib.request.urlopen(req)
     if response.status < 200 or response.status > 299:
         msg = '\n'.join([
-            f'An error occurred making request:', 
+            f'An error occurred making request:',
             f'-> URL: {url}',
             f'-> Status code: {response.status}',
             #f'-> Reason: {response.reason}'
@@ -258,85 +286,46 @@ def download_remote_files(item, local_path, headers):
     return local_filenames
 
 
-def get_data(
-    experiment_id,
-    component,
-    var,
-    variant_id,
-    verbose=False,
-    add_historical=False
-):
+def merge_nc_files(paths, output):
     '''
-    Function: get_data()
-        Load a UKESM1 output variable from a local path with xarray.
-        Format:
-        `_data/cmip6/UKESM1-0-LL/{var}_{component}_UKESM1-0-LL_{e_id}_{variant_id}_gn_{y}.nc`
+    Function merge_nc_files():
+        Merge .nc files using `ncrcat` via pynco,
+        which preserves original compression
+        See:
+            https://github.com/nco/pynco
+            http://nco.sourceforge.net/nco.html
 
     Inputs:
-    - experiment_id (string): model experiment
-        e.g. 'historical', 'ssp585'
-    - component (string): model components
-        e.g. 'Amon'
-    - var (string): variable
-        e.g. 'pr'
-    - variant_id (string): model realisation
-        e.g. 'r2i1p1f2'
-    - verbose (bool): whether to output loading/errors
-        default: False
-    - add_historical (bool): whether to prepend historical runs to data
-        default: False
+        - paths (array): list of file paths to merge
+        - output (string): merged filepath to write to
 
-    Outputs:
-    - (xarray): loaded data
-
-    TODO:
-    - custom model [e.g. UKESM1-0-LL]
-    - custom year ranges/grid size
+    Output:
+        - (string): merged filepath (same as output)
     '''
-    # Ensure `_data` dir exists
-    base_path = Path('_data/cmip6')
-    base_path.mkdir(parents=True, exist_ok=True)
-
-    # Set year ranges
-    years = ['201501-204912', '205001-210012']
-    experiment_ids = [experiment_id, experiment_id]
-    if experiment_id == 'historical':
-        years = ['185001-194912', '195001-201412']
-    elif add_historical:
-        years[:0] = ['185001-194912', '195001-201412']
-        experiment_ids[:0] = ['historical', 'historical']
-
-    # Gather relevant files
-    files = []
-    for i, y in enumerate(years):
-        e_id = experiment_ids[i]
-
-        filename = f'{var}_{component}_UKESM1-0-LL_{e_id}_{variant_id}_gn_{y}.nc'
-        local_file = f'_data/cmip6/UKESM1-0-LL/{filename}'
-
-        verbose and print(f'Loading {filename}')
-        if not Path(local_file).exists():
-            verbose and print(f'-> Error 404. Exiting.')
-            return None
-
-        files.append(local_file)
-
-    # Merge into single xarray & return
-    return xarray.open_mfdataset(paths=files, combine='by_coords')
+    nco = Nco()
+    nco.ncrcat(input=paths, output=output)
+    return output
 
 
 def regrid(
-    data, 
-    grid=xesmf.util.grid_global(1.875, 1.25), 
-    method='bilinear', 
-    extrap_method=None, 
+    data,
+    grid=xesmf.util.grid_global(1.875, 1.25),
+    method='bilinear',
+    extrap_method=None,
+    copy_dims=[],
     save_file=None
 ):
+    # Check if the data already has the target grid
+    if hasattr(data, 'attrs') and hasattr(grid, 'attrs'):
+        if data.attrs['grid'] == grid.attrs['grid']:
+            return data
+
+    # Perform regridding
     regridder = xesmf.Regridder(data, grid, method=method, extrap_method=extrap_method)
     data_regridded = regridder(data)
 
     # Re-add attributes from original data
-    if 'attrs' in data:
+    if hasattr(data, 'attrs'):
         for k in data.attrs:
             data_regridded.attrs[k] = data.attrs[k]
 
@@ -347,12 +336,15 @@ def regrid(
                 data_regridded[var].attrs[k] = data[var].attrs[k]
 
     # Add new grid attribute
-    if 'attrs' in grid and 'grid' in grid.attrs:
+    if hasattr(grid, 'attrs') and ('grid' in grid.attrs):
         # Preserve original grid attribute just in case
         if 'grid' in data_regridded.attrs:
             data_regridded.attrs['grid_original'] = data_regridded.attrs['grid']
 
         data_regridded.attrs['grid'] = grid.attrs['grid']
+
+    for dim in copy_dims:
+        data_regridded[dim] = grid[dim]
 
     if save_file != None:
         write = data_regridded.to_netcdf(save_file, compute=False)
