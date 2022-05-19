@@ -4,6 +4,7 @@ import cartopy.crs as ccrs
 import cftime
 import datetime
 import libs.helpers as helpers
+import libs.vars
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -64,7 +65,7 @@ def monthly_spatial(
 
 
 def monthly_variability(
-    data,
+    arr,
     title,
     ylabel,
     yrange=None
@@ -72,7 +73,7 @@ def monthly_variability(
     '''
     Function: monthly_variability()
         Plot an array of data with monthly averages on a single figure
-    
+
     Inputs:
     - data (array): array of time series data to plot
         format: [{ 'data': (xarray), 'label': (string) }]
@@ -81,39 +82,46 @@ def monthly_variability(
     - yrange (array): y-axis range
         format: [min, max]
         default: None
-    
+
     Outputs: None
-    
+
     TODO:
     - color
     '''
     fig, ax = plt.subplots(figsize=(21, 6))
     fig.suptitle(title)
     yrange != None and ax.set_ylim(*yrange)
-    monthly_variability_subplot(data, ax, '', ylabel)
+    monthly_variability_subplot(arr, ax, '', ylabel)
     ax.legend(loc='best')
 
 
 def monthly_variability_regional(
-    data,
+    ensemble,
     title,
     ylabel,
     mask_type='latlon',
+    calc_ensemble_mean=False,
     process=lambda x: x,
     ylim=None
 ):
     '''
     Function: monthly_variability_regional()
-        Mask data to nsidc regions and plot monthly variability
+        Mask ensemble data to nsidc regions and plot monthly variability
 
     Inputs:
-    - data (xarray): data to process and plot
+    - arr (xarray): array of data in format
+        [{ 'label': (string), 'data': (xarray) }, ...]
     - title (string): axis title
     - ylabel (string): y-axis label
-    - process (function): process data before plotting
+    - mask_type (string): whether to load mask on ocean or latlon grid
+        allowed values: 'latlon', 'ocean'
+        default: 'latlon'
+    - calc_ensemble_mean (bool): whether to calculate ensemble mean
+        default: False
+    - process (function): process data before plotting, input is
+        arr item['data'] which has been already masked to region
         default: lambda x: x
-    - ylim (array): y-axis range
-        e.g. [0, 5]
+    - ylim (array): y-axis range e.g. [0, 5]
         default: None
 
     Outputs: None
@@ -123,7 +131,7 @@ def monthly_variability_regional(
     - automate ylim
     - legend below subplots?
     '''
-    regions = helpers.nsidc_regions()
+    regions = libs.vars.nsidc_regions()
     path_nsidc_mask = '_data/_cache/NSIDC_Regions_Masks_LatLon_nearest_s2d.nc'
     if mask_type == 'ocean':
         path_nsidc_mask = '_data/_cache/NSIDC_Regions_Masks_Ocean_nearest_s2d.nc'
@@ -138,10 +146,18 @@ def monthly_variability_regional(
     fig.suptitle(title)
 
     for i, region in enumerate(regions[1:]):
-        data_masked = data.copy().where(np.isin(nsidc_mask.values, region['values']))
-        data_masked = process(data_masked)
+        ensemble_masked = [{
+            'data': process(
+                item['data'].where(np.isin(nsidc_mask.values, region['values']))
+            ),
+            'label': item['label']
+        } for item in ensemble]
+
+        if calc_ensemble_mean:
+            ensemble_masked.append(libs.analysis.ensemble_mean(ensemble_masked))
+
         ax = axs[i]
-        monthly_variability_subplot(data_masked, ax, region['label'], ylabel)
+        monthly_variability_subplot(ensemble_masked, ax, region['label'], ylabel)
         i == 0 and ax.legend(loc='best')
 
     fig.tight_layout()
@@ -167,13 +183,15 @@ def monthly_variability_subplot(data, ax, title, ylabel):
     - color
     '''
     for i, item in enumerate(data):
+        #color = item['color' if 'color' in item else None
         item['data'].plot(ax=ax, label=item['label']) #, color=color)
 
     ax.grid()
     ax.set_xlim(1, 12)
     months = np.arange(1, 13)
     month_ticks = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
-    ax.set_xticks(months, month_ticks)
+    ax.set_xticks(months) #, month_ticks)
+    ax.set_xticklabels(month_ticks)
     ax.set(xlabel='Month', ylabel=ylabel)
     ax.set_title(title)
 
@@ -181,21 +199,21 @@ def monthly_variability_subplot(data, ax, title, ylabel):
 def nstereo(
     arr,
     title,
-    colorbar_label, 
+    colorbar_label,
     colormesh_kwargs,
     shape=None
 ):
     '''
     Function: nstereo()
         Create a set of subplots on a north stereographic projection (60-90N)
-    
+
     Inputs:
     - arr (array): array of data to plot
         format: [{ 'data': (xarray), 'label': (string) }]
     - title (string): title of plot
     - colorbar_label (string): colorbar label
     - colormesh_kwargs (dict): kwargs to pass to pcolormesh
-        e.g. 
+        e.g.
         {
             'cmap': 'PuBu',
             'extend': 'max', # ['min', 'both']
@@ -207,8 +225,8 @@ def nstereo(
         See:
         - https://xarray.pydata.org/en/stable/generated/xarray.plot.pcolormesh.html
         - https://matplotlib.org/stable/gallery/color/colormap_reference.html
-        
-    
+
+
     Outputs: None
     '''
     if shape == None:
@@ -217,16 +235,19 @@ def nstereo(
     fig, axs = plt.subplots(
         *shape,
         figsize=(15, 6 * shape[0]),
-        subplot_kw={ 
+        subplot_kw={
             'projection': ccrs.Stereographic(central_latitude=90.0)
         }
     )
     fig.suptitle(title)
     transform = ccrs.PlateCarree()
     axs = axs.flatten() if len(arr) > 1 else [axs]
-    
+
     subfigs = []
     for i, ax in enumerate(axs):
+        if i >= len(arr):
+            continue
+
         ax.coastlines(resolution='110m', linewidth=0.5)
         ax.set_extent([-180, 180, 60, 90], transform)
         gl = ax.gridlines()
@@ -247,7 +268,7 @@ def nstereo(
         )
         ax.set_title(arr[i]['label'])
         subfigs.append(subfig)
-    
+
     colorbar_ax = axs.ravel().tolist() if len(arr) > 1 else axs
     fig.colorbar(
         subfigs[0],
@@ -310,18 +331,18 @@ def seasonal_spatial(
 
 
 def time_series(
-    data, 
-    title, 
+    data,
+    title,
     xattr,
     ylabel,
     process=lambda x: x,
     years=np.arange(1980, 2101, 20),
-    yrange=None
+    yrange=None,
 ):
     '''
     Function: time_series()
         Plot an array of time series on a single figure
-    
+
     Inputs:
     - data (array): array of time series data to plot
         format: [{ 'data': (xarray), 'label': (string) }]
@@ -335,9 +356,9 @@ def time_series(
     - yrange (array): y-axis range
         format: [min, max]
         default: None
-    
+
     Outputs: None
-    
+
     TODO:
     - color
     '''
@@ -364,4 +385,5 @@ def time_series(
     year_ticks = years
     if xattr == 'time':
         year_ticks = [cftime.Datetime360Day(y, 1, 1, 0, 0, 0) for y in years]
-    ax.set_xticks(year_ticks, years)
+    ax.set_xticks(year_ticks) #, years)
+    ax.set_xticklabels(years)
