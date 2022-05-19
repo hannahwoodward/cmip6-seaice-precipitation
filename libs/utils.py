@@ -148,7 +148,7 @@ def download_variable(
             continue
 
         item_source_id = item['source_id'][0]
-        item_local_path = f'_data/cmip6/{item_source_id}'
+        item_local_path = f'_data/cmip6/{item_source_id}/{variable_id}'
         try:
             local_filenames = download_remote_files(item, item_local_path, headers)
         except Exception as e:
