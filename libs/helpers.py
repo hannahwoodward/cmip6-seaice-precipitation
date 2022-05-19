@@ -22,25 +22,13 @@ def default_slices(data):
     TODO:
     - change first to 1980-2010
     '''
-
+    print('--- DEPRECATED ---')
+    print('switch to libs.vars.')
     return [
         { 'data': data.sel(time=slice('2015-01-01', '2036-01-01')), 'label': '2015-2035' },
         { 'data': data.sel(time=slice('2040-01-01', '2061-01-01')), 'label': '2040-2060' },
         { 'data': data.sel(time=slice('2080-01-01', '2101-01-01')), 'label': '2080-2100' }
     ]
-
-
-def ensemble_mean(arr):
-    data = arr[0]['data'].copy()
-    for item in arr[1:]:
-        data += item['data']
-
-    data /= len(arr)
-
-    return {
-        'data': data,
-        'label': 'Ensemble mean'
-    }
 
 
 def monthly_means_spatial(data, month):
@@ -64,6 +52,8 @@ def monthly_means_spatial(data, month):
     TODO:
     - change first to 1980-2010
     '''
+    print('--- DEPRECATED ---')
+    print('switch to libs.analysis.calendar_division_mean')
     slices = default_slices(data)
 
     for i, item in enumerate(slices):
@@ -80,7 +70,7 @@ def monthly_means_time(data, weight, dim=None, fillna=False):
         Create an array of sliced data which has each been sliced to a
         year range, averaged spatially over specified dims and a monthly
         mean taken
-    
+
     Inputs:
     - data (xarray): data to slice and process
     - weight (xarray): array to weight data against (e.g. areacella)
@@ -89,7 +79,7 @@ def monthly_means_time(data, weight, dim=None, fillna=False):
         default: None (all weighted dimensions averaged)
     - fillna (bool): whether to fill any NaN values in the final
         time series with zero
-    
+
     Outputs:
     - (array): slices
         format: [
@@ -97,12 +87,14 @@ def monthly_means_time(data, weight, dim=None, fillna=False):
             { 'data': (xarray), 'label': '2040-2060' },
             { 'data': (xarray), 'label': '2080-2100' }
         ]
-    
+
     TODO:
     - change first to 1980-2010
     '''
+    print('--- DEPRECATED ---')
+    print('switch to libs.analysis.monthly_weighted')
     slices = default_slices(data)
-    
+
     for i, item in enumerate(slices):
         data = item['data']
         data_weighted = data.weighted(weight)
@@ -112,7 +104,7 @@ def monthly_means_time(data, weight, dim=None, fillna=False):
             .mean(dim=data_dim, skipna=True)\
             .groupby('time.month')\
             .mean('time')
-        
+
         if fillna:
             slices[i]['data'] = slices[i]['data'].fillna(0)
 
@@ -143,6 +135,8 @@ def monthly_sums_time(data, weight, dim=None):
     TODO:
     - change first to 1980-2010
     '''
+    print('--- DEPRECATED ---')
+    print('switch to libs.analysis.monthly_weighted')
     slices = default_slices(data)
 
     for i, item in enumerate(slices):
@@ -179,6 +173,8 @@ def seasonal_means_spatial(data, season):
     TODO:
     - change first to 1980-2010
     '''
+    print('--- DEPRECATED ---')
+    print('switch to libs.analysis.calendar_division_mean')
     slices = default_slices(data)
 
     for i, item in enumerate(slices):
@@ -202,4 +198,6 @@ def smoothed_mean(data, time=60):
     Outputs:
     - (xarray): smoothed data
     '''
+    print('--- DEPRECATED ---')
+    print('switch to libs.analysis.smoothed_mean')
     return data.rolling(time=time, center=True).mean(dim=('month'))
