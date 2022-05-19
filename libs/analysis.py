@@ -1,7 +1,7 @@
 import libs.vars
 
 
-def calendar_division_mean(data, division='month', time):
+def calendar_division_mean(data, time, division='month'):
     '''
     Function: calendar_division_mean()
         Filter data by specified month/season and calculate
@@ -9,12 +9,12 @@ def calendar_division_mean(data, division='month', time):
 
     Inputs:
     - data (xarray): data to slice and process
-    - division (string): type of time division
-        allowed values: 'month', 'season'
-        default: 'month'
     - time (int|string): month or season to average over
         month value should be an integer, i.e. JAN = 1, ..., DEC = 12
         season value should be in ['DJF', 'MAM', 'JJA', 'SON']
+    - division (string): type of time division
+        allowed values: 'month', 'season'
+        default: 'month'
 
     Outputs:
     - (xarray): processed data
