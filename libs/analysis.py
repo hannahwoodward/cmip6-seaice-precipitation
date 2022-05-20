@@ -82,6 +82,7 @@ def generate_slices(
 
     for s in slices:
         ensemble_processed = [{
+            'color': item['color'],
             'data': item['data'].sel(**s['slice']),
             'label': item['label']
         } for item in ensemble]
