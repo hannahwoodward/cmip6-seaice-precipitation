@@ -3,6 +3,7 @@
 import cartopy.crs as ccrs
 import cftime
 import datetime
+import libs.analysis
 import libs.helpers as helpers
 import libs.vars
 import matplotlib
@@ -12,7 +13,7 @@ import xarray
 
 
 def monthly_spatial(
-    arr,
+    time_slices,
     colormesh_kwargs,
     units,
     months=['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
@@ -52,12 +53,15 @@ def monthly_spatial(
     for m in months:
         m_index = datetime.datetime.strptime(m, '%b').month
 
-        for item in arr:
-            data_mod = helpers.monthly_means_spatial(item['data'].copy(), m_index)
-            label = item['label']
+        for s in time_slices:
+            label = s['label']
+            ensemble = [{
+                'data': libs.analysis.calendar_division_mean(item['data'], m_index),
+                'label': item['label']
+            } for item in s['ensemble']]
 
             nstereo(
-                data_mod,
+                ensemble,
                 title=title.format(m=m, label=label.lower(), units=units),
                 colorbar_label=f'{label} ({units})',
                 colormesh_kwargs=colormesh_kwargs
