@@ -1,6 +1,31 @@
 # -*- coding: utf-8 -*-
 
 
+def default_time_slices():
+    '''
+    Function: default_time_slices()
+        Get the default time periods for analysis,
+        use with .sel(**item['slice'])
+
+    Outputs:
+    - (array): slices
+        format: [
+            { 'slice': { 'time': slice('2015-01-01', '2036-01-01') }, 'label': '2015-2035' },
+            { 'slice': { 'time': slice('2040-01-01', '2061-01-01') }, 'label': '2040-2060' },
+            { 'slice': { 'time': slice('2080-01-01', '2101-01-01') }, 'label': '2080-2100' }
+        ]
+
+    TODO:
+    - change first to 1980-2010
+    '''
+
+    return [
+        { 'slice': { 'time': slice('2015-01-01', '2036-01-01') }, 'label': '2015-2035' },
+        { 'slice': { 'time': slice('2040-01-01', '2061-01-01') }, 'label': '2040-2060' },
+        { 'slice': { 'time': slice('2080-01-01', '2101-01-01') }, 'label': '2080-2100' }
+    ]
+
+
 def ensemble():
     return [
         {
