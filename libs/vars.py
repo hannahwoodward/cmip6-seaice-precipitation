@@ -5,10 +5,12 @@ def ensemble():
     return [
         {
             'areacello_variant_label': 'r1i1p1f2',
+            'color': '#1982C4',
             'experiment_id': 'ssp585',
             'source_id': 'UKESM1-0-LL',
-            'variant_label': 'r2i1p1f2',
+            'variant_label': 'r2i1p1f2'
         }, {
+            'color': '#43AA8B',
             'experiment_id': 'ssp585',
             'source_id': 'NorESM2-LM',
             'variant_label': 'r1i1p1f1',
@@ -23,19 +25,23 @@ def ensemble():
         #   'variant_label': 'r4i1p1f1',
         }, {
             # missing: sipr, dynamics, frazil, lateral melt, evapsubl
+            'color': '#90BE6D',
             'experiment_id': 'ssp585',
             'source_id': 'CanESM5',
             'variant_label': 'r1i1p2f1',
         }, {
+            'color': '#FFCA3A',
             'experiment_id': 'ssp585',
             'source_id': 'CMCC-ESM2',
             'variant_label': 'r1i1p1f1',
         }, {
             # No explicit lateral melt or frazil ice formation
+            'color': '#FF924C',
             'experiment_id': 'ssp585',
             'source_id': 'ACCESS-CM2',
             'variant_label': 'r1i1p1f1',
         }
+        # #F94144 #F3722C #577590 #4267AC #565AA0 #6A4C93
         # NB currently status 500
         #, {
         #    # missing: sipr, No explicit lateral melt

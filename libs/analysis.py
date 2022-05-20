@@ -36,7 +36,7 @@ def ensemble_mean(ensemble):
 
     Outputs:
     - (dict): the calculated mean in format
-        { 'data': (xarray), 'label': 'Ensemble mean' }
+        { 'color': '#000', 'data': (xarray), 'label': 'Ensemble mean' }
     '''
     data = ensemble[0]['data'].copy()
     for item in ensemble[1:]:
@@ -45,6 +45,7 @@ def ensemble_mean(ensemble):
     data /= len(ensemble)
 
     return {
+        'color': '#000',
         'data': data,
         'label': 'Ensemble mean'
     }

@@ -84,9 +84,6 @@ def monthly_variability(
         default: None
 
     Outputs: None
-
-    TODO:
-    - color
     '''
     fig, ax = plt.subplots(figsize=(21, 6))
     fig.suptitle(title)
@@ -147,6 +144,7 @@ def monthly_variability_regional(
 
     for i, region in enumerate(regions[1:]):
         ensemble_masked = [{
+            'color': item['color'],
             'data': process(
                 item['data'].where(np.isin(nsidc_mask.values, region['values']))
             ),
@@ -178,13 +176,10 @@ def monthly_variability_subplot(data, ax, title, ylabel):
     - ylabel (string): y-axis label
 
     Outputs: None
-
-    TODO:
-    - color
     '''
     for i, item in enumerate(data):
-        #color = item['color' if 'color' in item else None
-        item['data'].plot(ax=ax, label=item['label']) #, color=color)
+        color = item['color'] if 'color' in item else None
+        item['data'].plot(ax=ax, label=item['label'], color=color)
 
     ax.grid()
     ax.set_xlim(1, 12)
@@ -337,7 +332,7 @@ def time_series(
     ylabel,
     process=lambda x: x,
     years=np.arange(1980, 2101, 20),
-    yrange=None,
+    yrange=None
 ):
     '''
     Function: time_series()
@@ -358,9 +353,6 @@ def time_series(
         default: None
 
     Outputs: None
-
-    TODO:
-    - color
     '''
     fig, ax = plt.subplots(figsize=(21, 6))
     fig.suptitle(title)
@@ -368,8 +360,9 @@ def time_series(
     xmax = None
     for i, item in enumerate(data):
         label = item['label']
+        color = item['color'] if 'color' in item else None
         data_mod = process(item['data'].copy())
-        data_mod.plot(ax=ax, label=label) #, color=color)
+        data_mod.plot(ax=ax, label=label, color=color)
         data_x_min = np.nanmin(data_mod[xattr])
         data_x_max = np.nanmax(data_mod[xattr])
         xmin = np.nanmin([xmin, data_x_min]) if xmin != None else data_x_min
