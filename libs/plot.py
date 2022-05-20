@@ -234,7 +234,7 @@ def nstereo(
 
     fig, axs = plt.subplots(
         *shape,
-        figsize=(15, 7 * shape[0]),
+        figsize=(5 * shape[1], 7 * shape[0]),
         subplot_kw={
             'projection': ccrs.Stereographic(central_latitude=90.0)
         }
