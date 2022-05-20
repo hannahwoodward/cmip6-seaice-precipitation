@@ -87,6 +87,7 @@ def nsidc_regions():
     '''
     return [
         { 'values': [6,7,8,9,10,11,12,13,15], 'label': 'All' },
+        { 'values': [8,9,10,11,12,13,15], 'label': 'Arctic Ocean' },
         { 'values': [6], 'label': 'Labrador' },
         { 'values': [7], 'label': 'Greenland' },
         { 'values': [8], 'label': 'Barents' },

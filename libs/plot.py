@@ -128,7 +128,8 @@ def monthly_variability_regional(
     - automate ylim
     - legend below subplots?
     '''
-    regions = libs.vars.nsidc_regions()
+    # Get all individual regions
+    regions = [r for r in libs.vars.nsidc_regions() if len(r['values']) == 1]
     path_nsidc_mask = '_data/_cache/NSIDC_Regions_Masks_LatLon_nearest_s2d.nc'
     if mask_type == 'ocean':
         path_nsidc_mask = '_data/_cache/NSIDC_Regions_Masks_Ocean_nearest_s2d.nc'
