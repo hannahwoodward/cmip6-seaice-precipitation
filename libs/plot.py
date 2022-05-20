@@ -85,7 +85,7 @@ def monthly_variability(
 
     Outputs: None
     '''
-    fig, ax = plt.subplots(figsize=(21, 6))
+    fig, ax = plt.subplots(figsize=(15, 7))
     fig.suptitle(title)
     yrange != None and ax.set_ylim(*yrange)
     monthly_variability_subplot(arr, ax, '', ylabel)
@@ -143,7 +143,7 @@ def monthly_variability_regional(
     axs = axs.flatten()
     fig.suptitle(title)
 
-    for i, region in enumerate(regions[1:]):
+    for i, region in enumerate(regions):
         ensemble_masked = [{
             'color': item['color'],
             'data': process(
@@ -230,7 +230,7 @@ def nstereo(
 
     fig, axs = plt.subplots(
         *shape,
-        figsize=(15, 6 * shape[0]),
+        figsize=(15, 7 * shape[0]),
         subplot_kw={
             'projection': ccrs.Stereographic(central_latitude=90.0)
         }
@@ -355,15 +355,16 @@ def time_series(
 
     Outputs: None
     '''
-    fig, ax = plt.subplots(figsize=(21, 6))
+    fig, ax = plt.subplots(figsize=(15, 7))
     fig.suptitle(title)
     xmin = None
     xmax = None
     for i, item in enumerate(data):
         label = item['label']
         color = item['color'] if 'color' in item else None
+        plot_kwargs = item['plot_kwargs'] if 'plot_kwargs' in item else {}
         data_mod = process(item['data'].copy())
-        data_mod.plot(ax=ax, label=label, color=color)
+        data_mod.plot(ax=ax, label=label, color=color, **plot_kwargs)
         data_x_min = np.nanmin(data_mod[xattr])
         data_x_max = np.nanmax(data_mod[xattr])
         xmin = np.nanmin([xmin, data_x_min]) if xmin != None else data_x_min
