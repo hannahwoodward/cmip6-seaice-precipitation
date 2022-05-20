@@ -56,7 +56,7 @@ def generate_slices(
     slices=libs.vars.default_time_slices()
 ):
     '''
-    Function: ensemble_mean()
+    Function: generate_slices()
 
     Inputs:
     - ensemble (array): array with items formatted as
@@ -74,7 +74,7 @@ def generate_slices(
         [{
             'label': '2015-2035',
             'ensemble': [
-                 { 'data': (xarray), 'label: (string) }, ...
+                 { 'color': (string), 'data': (xarray), 'label': (string) }, ...
             ]
         }, ...]
     '''
