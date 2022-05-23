@@ -189,7 +189,7 @@ def monthly_variability_regional(
         monthly_variability_subplot(ensemble_masked, ax, region['label'], ylabel)
 
     ylim != None and plt.setp(axs, ylim=ylim)
-    place_legend(fig, axs[0], len(arr))
+    place_legend(fig, axs[0], len(ensemble))
 
 
 def monthly_variability_subplot(data, ax, title, ylabel):
@@ -325,8 +325,25 @@ def place_legend(fig, ax, data_size):
     Outputs: None
     '''
     if data_size > 1:
+        handles = []
+        labels = []
+        # Remove duplicate labels
+        for a in fig.axes:
+            a_handles, a_labels = a.get_legend_handles_labels()
+            for i, label in enumerate(a_labels):
+                if label not in labels:
+                    handles.append(a_handles[i])
+                    labels.append(label)
+
         legend_ncol = np.min([data_size, 5])
-        fig.legend(bbox_to_anchor=(0.5, -0.1), fontsize=16, loc='lower center', ncol=legend_ncol)
+        fig.legend(
+            handles=handles,
+            labels=labels,
+            bbox_to_anchor=(0.5, -0.1),
+            fontsize=16,
+            loc='lower center',
+            ncol=legend_ncol
+        )
     else:
         ax.legend(loc='best')
 
