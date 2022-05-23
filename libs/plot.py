@@ -15,16 +15,17 @@ import xarray
 def calendar_division_spatial(
     time_slices,
     colormesh_kwargs,
-    units,
     time,
-    division='month',
+    units,
     col_var='ensemble',
+    division='month',
+    text='',
     title=''
 ):
     '''
-    Function: monthly_spatial()
+    Function: calendar_division_spatial()
         Calculate monthly means for time slices and plot on a north stereographic
-        projection (60-90N)
+        projection (60-90°N)
 
     Inputs:
     - arr (array): array of data to plot
@@ -56,8 +57,10 @@ def calendar_division_spatial(
         that time_slices will vary by row, ensemble member will vary by column
         allowed values: 'time_slices', 'ensemble'
         default: 'ensemble'
-    - title (string): title of plot, will be formatted with m, label, units
-        e.g. '{m} SSP585 {label} 60-90°N ({units})'
+    - text (string): variable text to be formatted in the plot title and colorbar
+    - title (string): title of plot, will be formatted with time, label, units
+        e.g. '{label} {time} ssp585 {text} 60-90°N ({units})'
+        where label is either ensemble member or time slice depending on col_var/layout
         default: ''
 
     Outputs: None
@@ -85,9 +88,9 @@ def calendar_division_spatial(
 
         nstereo(
             cols,
-            title=title.format(time=time, label=label.lower(), units=units),
-            colorbar_label=f'{label} ({units})',
-            colormesh_kwargs=colormesh_kwargs
+            colorbar_label=f'{text} ({units})',
+            colormesh_kwargs=colormesh_kwargs,
+            title=title.format(label=label, text=text, time=time, units=units)
         )
 
 
