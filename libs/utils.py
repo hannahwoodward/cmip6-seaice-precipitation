@@ -1,4 +1,5 @@
 from dask.diagnostics import ProgressBar
+from datetime import datetime
 from nco import Nco
 from pathlib import Path
 import cftime
@@ -46,6 +47,27 @@ def convert_to_360_day(i):
     o.time.encoding['calendar'] = '360_day'
 
     return o
+
+
+def daterange_from_filename(filename):
+    '''
+    Function daterange_from_filename():
+        Get date range (as datetime objects) from filename.
+        Assumes a filename ends with '_{date_start}-{date_stop}.nc'
+        where dates are formatted as '%Y%m'
+
+    Inputs:
+        - filename (string): filename to get date range from
+
+    Output:
+        - (tuple): daterange (date_start, date_top)
+    '''
+    dates = filename.replace('.nc', '').split('_')[-1].split('-')
+
+    return (
+        datetime.strptime(dates[0], '%Y%m'),
+        datetime.strptime(dates[1], '%Y%m')
+    )
 
 
 def download_variable(
@@ -157,13 +179,21 @@ def download_variable(
         item_id = item['id']
         print(f'-> {item_id}')
 
-        if not save_to_local:
+        date_out_of_bounds = False
+        if time_slice != None:
+            test_date_bounds(
+                time_slice,
+                test_start=datetime.strptime(item['datetime_start'], '%Y-%m-%dT%H:%M:%SZ'),
+                test_stop=datetime.strptime(item['datetime_stop'], '%Y-%m-%dT%H:%M:%SZ')
+            )
+
+        if not save_to_local or date_out_of_bounds:
             continue
 
         item_source_id = item['source_id'][0]
         item_local_path = f'_data/cmip6/{item_source_id}/{variable_id}'
         try:
-            local_filenames = download_remote_files(item, item_local_path, headers)
+            local_filenames = download_remote_files(item, item_local_path, headers, time_slice)
         except Exception as e:
             print('An error occurred downloading remote files', e, sep='\n')
             return
@@ -241,7 +271,7 @@ def download_variable(
         return combined_path
 
 
-def download_remote_files(item, local_path, headers):
+def download_remote_files(item, local_path, headers, time_slice=None):
     '''
     Function: download_remote_files()
         Downlaoad remote files based off CEDA response item
@@ -251,6 +281,10 @@ def download_remote_files(item, local_path, headers):
     - item (dict): item from array response['response']['docs'] from request
         'https://esgf-index1.ceda.ac.uk/esg-search/search/'
     - local_path (string): path to save to (not including filename)
+    - headers
+    - time_slice (slice): filter files against time_slice before downloading
+        e.g. slice('2015-01-01', '2101-01-01')
+        default: None
 
     Outputs:
     - (array): array of local paths
@@ -279,6 +313,15 @@ def download_remote_files(item, local_path, headers):
 
         file_url = file_url[0]
         filename = urllib.parse.urlparse(file_url).path.split('/')[-1]
+
+        if time_slice != None:
+            date_out_of_bounds = test_date_bounds(
+                time_slice,
+                *daterange_from_filename(filename)
+            )
+            if date_out_of_bounds:
+                continue
+
         local_filename = Path(local_path, filename)
         local_filename.parent.mkdir(parents=True, exist_ok=True)
         local_filenames.append(str(local_filename))
@@ -402,3 +445,14 @@ def regrid(
             write.compute()
 
     return data_regridded
+
+
+def test_date_bounds(time_slice, test_start, test_stop):
+    time_stop = datetime.strptime(time_slice.stop, '%Y-%m-%d')
+    date_out_of_bounds = test_start < test_start
+    if date_out_of_bounds:
+        return date_out_of_bounds
+
+    time_start = datetime.strptime(time_slice.start, '%Y-%m-%d')
+    date_out_of_bounds = time_start > test_stop
+    return date_out_of_bounds
