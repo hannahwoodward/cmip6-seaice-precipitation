@@ -225,9 +225,10 @@ def monthly_variability_subplot(data, ax, title, ylabel):
 def nstereo(
     arr,
     title,
-    colorbar_label,
     colormesh_kwargs,
-    shape=None
+    colorbar_label='',
+    shape=None,
+    show_colorbar=True
 ):
     '''
     Function: nstereo()
@@ -260,7 +261,7 @@ def nstereo(
 
     fig, axs = plt.subplots(
         *shape,
-        figsize=(5 * shape[1], 7 * shape[0]),
+        figsize=(5 * shape[1], 6 * shape[0]),
         subplot_kw={
             'projection': ccrs.Stereographic(central_latitude=90.0)
         }
@@ -295,15 +296,16 @@ def nstereo(
         ax.set_title(arr[i]['label'])
         subfigs.append(subfig)
 
-    colorbar_ax = axs.ravel().tolist() if len(arr) > 1 else axs
-    fig.colorbar(
-        subfigs[0],
-        ax=colorbar_ax,
-        label=colorbar_label,
-        location='bottom',
-        pad=0.05,
-        shrink=0.5
-    )
+    if show_colorbar:
+        colorbar_ax = axs.ravel().tolist() if len(arr) > 1 else axs
+        fig.colorbar(
+            subfigs[0],
+            ax=colorbar_ax,
+            label=colorbar_label,
+            location='bottom',
+            pad=0.05,
+            shrink=0.5
+        )
 
 
 def time_series(
