@@ -119,7 +119,7 @@ def monthly_variability(
     fig.suptitle(title)
     yrange != None and ax.set_ylim(*yrange)
     monthly_variability_subplot(arr, ax, '', ylabel)
-    ax.legend(loc='best')
+    place_legend(fig, ax, len(arr))
 
 
 def monthly_variability_regional(
@@ -187,10 +187,9 @@ def monthly_variability_regional(
 
         ax = axs[i]
         monthly_variability_subplot(ensemble_masked, ax, region['label'], ylabel)
-        i == 0 and ax.legend(loc='best')
 
-    fig.tight_layout()
     ylim != None and plt.setp(axs, ylim=ylim)
+    place_legend(fig, axs[0], len(arr))
 
 
 def monthly_variability_subplot(data, ax, title, ylabel):
@@ -308,6 +307,32 @@ def nstereo(
         )
 
 
+def place_legend(fig, ax, data_size):
+    '''
+    Function: place_legend()
+        Automatically place legend based on data (i.e. ensemble) size.
+        A plot of:
+        - one dataset will have a legend placed in the best position on the
+          passed in axis
+        - multiple datasets will have a legend below the figure, with columns
+          of maximum 5
+
+    Inputs:
+    - fig (matplotlib.figure.Figure): figure to place legend on
+    - ax (matplotlib.axes.Axes): first (or chosen) axis to place legend on if data_size = 1
+    - data_size (integer): number of datasets plotted on figure
+
+    Outputs: None
+    '''
+    if data_size > 1:
+        legend_ncol = np.min([data_size, 5])
+        fig.legend(bbox_to_anchor=(0.5, -0.1), fontsize=16, loc='lower center', ncol=legend_ncol)
+    else:
+        ax.legend(loc='best')
+
+    fig.tight_layout()
+
+
 def time_series(
     data,
     title,
@@ -352,7 +377,6 @@ def time_series(
         xmin = np.nanmin([xmin, data_x_min]) if xmin != None else data_x_min
         xmax = np.nanmax([xmax, data_x_max]) if xmax != None else data_x_max
 
-    ax.legend(loc='best')
     ax.set(xlabel='Year', ylabel=ylabel),
     ax.set_title('')
     ax.grid()
@@ -364,3 +388,4 @@ def time_series(
         year_ticks = [cftime.Datetime360Day(y, 1, 1, 0, 0, 0) for y in years]
     ax.set_xticks(year_ticks) #, years)
     ax.set_xticklabels(years)
+    place_legend(fig, ax, len(data))
