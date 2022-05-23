@@ -1,3 +1,4 @@
+import datetime
 import libs.vars
 
 
@@ -9,9 +10,12 @@ def calendar_division_mean(data, time, division='month'):
 
     Inputs:
     - data (xarray): data to slice and process
-    - time (int|string): month or season to average over
-        month value should be an integer, i.e. JAN = 1, ..., DEC = 12
-        season value should be in ['DJF', 'MAM', 'JJA', 'SON']
+    - time (string): month or season to average over
+        allowed month values:
+            ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
+             'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+        allowed season values:
+            ['DJF', 'MAM', 'JJA', 'SON']
     - division (string): type of time division
         allowed values: 'month', 'season'
         default: 'month'
@@ -20,6 +24,10 @@ def calendar_division_mean(data, time, division='month'):
     - (xarray): processed data
     '''
     division_key = f'time.{division}'
+
+    # Convert from %b to integer
+    if division == 'month':
+        time = datetime.datetime.strptime(time, '%b').month
 
     return data.copy()\
         .where(data.time[division_key] == time)\
