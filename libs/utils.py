@@ -353,7 +353,7 @@ def get_data(
     Function: get_data()
         Load a UKESM1 output variable from a local path with xarray.
         Format:
-        `_data/cmip6/UKESM1-0-LL/{var}_{component}_{source_id}_{e_id}_{variant_id}_gn_{y}.nc`
+        `_data/cmip6/{source_id}/{var}_{component}_{source_id}_{e_id}_{variant_id}_gn_{y}.nc`
 
     Inputs:
     - component (string): model components, e.g. 'Amon', 'SImon'
