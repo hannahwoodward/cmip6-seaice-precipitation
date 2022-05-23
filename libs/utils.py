@@ -59,7 +59,8 @@ def download_variable(
     force_write=False,
     process_files=False,
     regrid_kwargs=None,
-    save_to_local=False
+    save_to_local=False,
+    time_slice=slice('2015-01-01', '2101-01-01')
 ):
     '''
     Function: download_variable()
@@ -96,6 +97,11 @@ def download_variable(
         default: None
     - save_to_local (bool): whether to download files to local
         default: False
+
+    TODO:
+    - Incorporate time_slice with ceda query, example response:
+        "datetime_start":"1850-01-16T00:00:00Z",
+        "datetime_stop":"2014-12-16T00:00:00Z"
     '''
     base_url = 'https://esgf-index1.ceda.ac.uk/esg-search/search/'
     query = {
@@ -187,8 +193,7 @@ def download_variable(
                 print('   -> Converted calendar to 360_day')
 
             # Select slice
-            # TODO pass in arg?
-            merged_array = merged_array.sel(time=slice('2015-01-01', '2101-01-01'))
+            merged_array = merged_array.sel(time=time_slice)
 
         # Perform regridding
         if regrid_kwargs != None:
