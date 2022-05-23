@@ -12,11 +12,13 @@ import numpy as np
 import xarray
 
 
-def monthly_spatial(
+def calendar_division_spatial(
     time_slices,
     colormesh_kwargs,
     units,
-    months=['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
+    time,
+    division='month',
+    col_var='ensemble',
     title=''
 ):
     '''
@@ -41,31 +43,52 @@ def monthly_spatial(
         - https://xarray.pydata.org/en/stable/generated/xarray.plot.pcolormesh.html
         - https://matplotlib.org/stable/gallery/color/colormap_reference.html
     - units (string): units to add to title and colorbar label
-    - months (array): array of months (in abbreviated format '%b') to plot
-        default: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
-                  'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+    - time (string): month or season to average over
+        allowed month values (in abbreviated format '%b'):
+            ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
+             'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+        allowed season values:
+            ['DJF', 'MAM', 'JJA', 'SON']
+    - division (string): type of time division
+        allowed values: 'month', 'season'
+        default: 'month'
+    - col_var (string): controls plot layout, i.e. default value of 'ensemble' means
+        that time_slices will vary by row, ensemble member will vary by column
+        allowed values: 'time_slices', 'ensemble'
+        default: 'ensemble'
     - title (string): title of plot, will be formatted with m, label, units
         e.g. '{m} SSP585 {label} 60-90°N ({units})'
         default: ''
 
     Outputs: None
     '''
-    for m in months:
-        m_index = datetime.datetime.strptime(m, '%b').month
+    rows = time_slices
+    if col_var == 'time_slices':
+        rows = []
+        for i, item in enumerate(time_slices[0]['ensemble']):
+            row = [{
+                'data': s['ensemble'][i]['data'],
+                'label': s['label']
+            } for s in time_slices]
 
-        for s in time_slices:
-            label = s['label']
-            ensemble = [{
-                'data': libs.analysis.calendar_division_mean(item['data'], m_index),
+            rows.append({
+                'time_slices': row,
                 'label': item['label']
-            } for item in s['ensemble']]
+            })
 
-            nstereo(
-                ensemble,
-                title=title.format(m=m, label=label.lower(), units=units),
-                colorbar_label=f'{label} ({units})',
-                colormesh_kwargs=colormesh_kwargs
-            )
+    for r in rows:
+        label = r['label']
+        cols = [{
+            'data': libs.analysis.calendar_division_mean(item['data'], time, division),
+            'label': item['label']
+        } for item in r[col_var]]
+
+        nstereo(
+            cols,
+            title=title.format(time=time, label=label.lower(), units=units),
+            colorbar_label=f'{label} ({units})',
+            colormesh_kwargs=colormesh_kwargs
+        )
 
 
 def monthly_variability(
@@ -278,56 +301,6 @@ def nstereo(
         pad=0.05,
         shrink=0.5
     )
-
-
-def seasonal_spatial(
-    arr,
-    colormesh_kwargs,
-    units,
-    seasons=['DJF', 'MAM', 'JJA', 'SON'],
-    title=''
-):
-    '''
-    Function: seasonal_spatial()
-        Calculate seasonal means for time slices and plot on a north stereographic
-        projection (60-90N)
-
-    Inputs:
-    - arr (array): array of data to plot
-        format: [{ 'data': (xarray), 'label': (string) }]
-    - colormesh_kwargs (dict): kwargs to pass to pcolormesh
-        e.g.
-        {
-            'cmap': 'PuBu',
-            'extend': 'max', # ['min', 'both']
-            'vmin': 0,
-            'vmax': 1,
-            'x': 'longitude',
-            'y': 'latitude'
-        }
-        See:
-        - https://xarray.pydata.org/en/stable/generated/xarray.plot.pcolormesh.html
-        - https://matplotlib.org/stable/gallery/color/colormap_reference.html
-    - units (string): units to add to title and colorbar label
-    - seasons (array): array of seasons to plot
-        default: ['DJF', 'MAM', 'JJA', 'SON']
-    - title (string): title of plot, will be formatted with s, label, units
-        e.g. '{s} SSP585 {label} 60-90°N ({units})'
-        default: ''
-
-    Outputs: None
-    '''
-    for s in seasons:
-        for item in arr:
-            data_mod = helpers.seasonal_means_spatial(item['data'].copy(), s)
-            label = item['label']
-
-            nstereo(
-                data_mod,
-                title=title.format(s=s, label=label.lower(), units=units),
-                colorbar_label=f'{label} ({units})',
-                colormesh_kwargs=colormesh_kwargs
-            )
 
 
 def time_series(
