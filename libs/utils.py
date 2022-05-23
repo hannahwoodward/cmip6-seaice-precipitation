@@ -347,6 +347,7 @@ def get_data(
     source_id,
     variable_id,
     variant_label,
+    include_hist=False,
     suffix=None
 ):
     '''
@@ -370,13 +371,21 @@ def get_data(
 
     basepath = f'_data/cmip6/{source_id}/{variable_id}/'
     filename = f'{variable_id}_{component}_{source_id}_{experiment_id}_{variant_label}_gn{suffix}.nc'
-    filepath = f'{basepath}{filename}'
+    filepaths = [f'{basepath}{filename}']
 
-    if not Path(filepath).exists():
-        print('Error 404', f'-> {filepath}', sep='\n')
-        return None
+    if include_hist:
+        experiment_id = 'historical'
+        suffix = '_198001-201412_processed'
 
-    return xarray.open_mfdataset(paths=filepath, combine='by_coords', use_cftime=True)
+        filename = f'{variable_id}_{component}_{source_id}_{experiment_id}_{variant_label}_gn{suffix}.nc'
+        filepaths.append(f'{basepath}{filename}')
+
+    for filepath in filepaths:
+        if not Path(filepath).exists():
+            print('Error 404', f'-> {filepath}', sep='\n')
+            return None
+
+    return xarray.open_mfdataset(paths=filepaths, combine='by_coords', use_cftime=True)
 
 
 def merge_nc_files(paths, output):

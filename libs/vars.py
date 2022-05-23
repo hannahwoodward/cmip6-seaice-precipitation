@@ -10,17 +10,14 @@ def default_time_slices():
     Outputs:
     - (array): slices
         format: [
-            { 'slice': { 'time': slice('2015-01-01', '2036-01-01') }, 'label': '2015-2035' },
+            { 'slice': { 'time': slice('1980-01-01', '2011-01-01') }, 'label': '2015-2035' },
             { 'slice': { 'time': slice('2040-01-01', '2061-01-01') }, 'label': '2040-2060' },
             { 'slice': { 'time': slice('2080-01-01', '2101-01-01') }, 'label': '2080-2100' }
         ]
-
-    TODO:
-    - change first to 1980-2010
     '''
 
     return [
-        { 'slice': { 'time': slice('2015-01-01', '2036-01-01') }, 'label': '2015-2035' },
+        { 'slice': { 'time': slice('1980-01-01', '2011-01-01') }, 'label': '1980-2010' },
         { 'slice': { 'time': slice('2040-01-01', '2061-01-01') }, 'label': '2040-2060' },
         { 'slice': { 'time': slice('2080-01-01', '2101-01-01') }, 'label': '2080-2100' }
     ]
