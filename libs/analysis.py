@@ -132,6 +132,7 @@ def monthly_weighted(data, weight, method='sum', dim=None):
     dim = dim if dim != None else data_weighted.weights.dims
 
     return getattr(data_weighted, method)(dim=dim, skipna=True)\
+        .fillna(0)\
         .groupby('time.month')\
         .mean('time')
 
