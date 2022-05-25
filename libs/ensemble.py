@@ -88,7 +88,8 @@ def monthly_variability_full(
     plot_kwargs,
     weight,
     weighting_method,
-    weighting_process
+    weighting_process,
+    calc_ensemble_mean=True,
 ):
     for s in ensemble_time_slices:
         ensemble_processed = [{
@@ -103,7 +104,7 @@ def monthly_variability_full(
         } for item in s['ensemble']]
 
         # Calculate and add ensemble mean
-        ensemble_processed.append(libs.analysis.ensemble_mean(ensemble_processed))
+        calc_ensemble_mean and ensemble_processed.append(libs.analysis.ensemble_mean(ensemble_processed))
 
         s_label = s['label']
         kwargs = dict(plot_kwargs)
