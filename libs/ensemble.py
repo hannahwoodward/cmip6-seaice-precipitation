@@ -98,7 +98,8 @@ def monthly_variability_full(
                 weight,
                 method=weighting_method
             ),
-            'label': item['label']
+            'label': item['label'],
+            'plot_kwargs': item['plot_kwargs'] if 'plot_kwargs' in item else {}
         } for item in s['ensemble']]
 
         # Calculate and add ensemble mean
@@ -118,7 +119,13 @@ def time_series_full_variability(ensemble_weighted_reduced, plot_kwargs):
         libs.plot.time_series([item], xattr='time', **kwargs)
 
 
-def time_series_weighted(ensemble, weight, weighting_method, weighting_process):
+def time_series_weighted(
+    ensemble,
+    weight,
+    weighting_method,
+    weighting_process,
+    item_plot_kwargs={}
+):
     ensemble_weighted_reduced = []
     ensemble_weighted_reduced_smooth = []
 
@@ -134,7 +141,8 @@ def time_series_weighted(ensemble, weight, weighting_method, weighting_process):
 
         item_base_kwargs = {
             'color': item['color'],
-            'label': item['label']
+            'label': item['label'],
+            'plot_kwargs': item_plot_kwargs
         }
 
         ensemble_weighted_reduced.append(

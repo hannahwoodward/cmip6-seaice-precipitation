@@ -209,7 +209,8 @@ def monthly_variability_subplot(data, ax, title, ylabel):
     '''
     for i, item in enumerate(data):
         color = item['color'] if 'color' in item else None
-        item['data'].plot(ax=ax, label=item['label'], color=color)
+        plot_kwargs = item['plot_kwargs'] if 'plot_kwargs' in item else {}
+        item['data'].plot(ax=ax, label=item['label'], color=color, **plot_kwargs)
 
     ax.grid()
     ax.set_xlim(1, 12)

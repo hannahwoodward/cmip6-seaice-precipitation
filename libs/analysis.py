@@ -61,6 +61,7 @@ def ensemble_mean(ensemble):
 
 def generate_slices(
     ensemble,
+    item_plot_kwargs={},
     slices=libs.vars.default_time_slices()
 ):
     '''
@@ -68,7 +69,12 @@ def generate_slices(
 
     Inputs:
     - ensemble (array): array with items formatted as
-        { 'data': (xarray), 'label: (string) }
+        {
+            'color': (string),
+            'data': (xarray),
+            'label': (string),
+            'plot_kwargs': (dict)
+        }
     - slices (array): array of slices in format
         {
             'slice': { 'time': slice('2015-01-01', '2036-01-01') },
@@ -91,6 +97,7 @@ def generate_slices(
     for s in slices:
         ensemble_processed = [{
             'color': item['color'],
+            'plot_kwargs': item_plot_kwargs,
             'data': item['data'].sel(**s['slice']),
             'label': item['label']
         } for item in ensemble]
