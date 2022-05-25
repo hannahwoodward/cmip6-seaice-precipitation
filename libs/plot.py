@@ -120,6 +120,7 @@ def monthly_variability(
     yrange != None and ax.set_ylim(*yrange)
     monthly_variability_subplot(arr, ax, '', ylabel)
     place_legend(fig, ax, len(arr))
+    fig.show()
 
 
 def monthly_variability_regional(
@@ -190,6 +191,7 @@ def monthly_variability_regional(
 
     ylim != None and plt.setp(axs, ylim=ylim)
     place_legend(fig, axs[0], len(ensemble))
+    fig.show()
 
 
 def monthly_variability_subplot(data, ax, title, ylabel):
@@ -306,6 +308,8 @@ def nstereo(
             pad=0.05,
             shrink=0.5
         )
+
+    fig.show()
 
 
 def place_legend(fig, ax, data_size):
