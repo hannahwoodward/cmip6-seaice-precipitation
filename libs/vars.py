@@ -10,7 +10,7 @@ def default_time_slices():
     Outputs:
     - (array): slices
         format: [
-            { 'slice': { 'time': slice('1980-01-01', '2011-01-01') }, 'label': '2015-2035' },
+            { 'slice': { 'time': slice('1980-01-01', '2011-01-01') }, 'label': '1980-2010' },
             { 'slice': { 'time': slice('2040-01-01', '2061-01-01') }, 'label': '2040-2060' },
             { 'slice': { 'time': slice('2080-01-01', '2101-01-01') }, 'label': '2080-2100' }
         ]
@@ -36,7 +36,7 @@ def ensemble():
             'experiment_id': 'ssp585',
             'source_id': 'NorESM2-LM',
             'variant_label': 'r1i1p1f1',
-        # }, {
+        }, {
         # NB currently status 404
         #    'experiment_id': 'ssp585',
         #    'source_id': 'CESM2-WACCM',
@@ -45,32 +45,36 @@ def ensemble():
         #    'experiment_id': 'ssp585',
         #    'source_id': 'CESM2',
         #   'variant_label': 'r4i1p1f1',
-        }, {
+        #}, {
             # missing: sipr, dynamics, frazil, lateral melt, evapsubl
             'color': '#90BE6D',
             'experiment_id': 'ssp585',
             'source_id': 'CanESM5',
             'variant_label': 'r1i1p2f1',
         }, {
-            'color': '#FFCA3A',
-            'experiment_id': 'ssp585',
-            'source_id': 'CMCC-ESM2',
-            'variant_label': 'r1i1p1f1',
-        }, {
+        # not included in keen et al. 2021
+        #    'color': None,
+        #    'experiment_id': 'ssp585',
+        #    'source_id': 'CMCC-ESM2',
+        #    'variant_label': 'r1i1p1f1',
+        #}, {
             # No explicit lateral melt or frazil ice formation
             'color': '#FF924C',
             'experiment_id': 'ssp585',
             'source_id': 'ACCESS-CM2',
             'variant_label': 'r1i1p1f1',
-        }
+        }, {
         # #F94144 #F3722C #577590 #4267AC #565AA0 #6A4C93
-        # NB currently status 500
-        #, {
-        #    # missing: sipr, No explicit lateral melt
-        #    'experiment_id': 'ssp585',
-        #    'source_id': 'GFDL-ESM4',
-        #    'variant_label': 'r1i1p1f1'
-        #}
+        #    # missing: No explicit lateral melt
+            'color': '#FFCA3A',
+            'experiment_id': 'ssp585',
+            'source_id': 'EC-Earth3',
+            'variant_label': 'r4i1p1f1',
+            'pr': { 'grid_label': 'gr' },
+            'prsn': { 'grid_label': 'gr' },
+            'prra': { 'grid_label': 'gr' },
+            'tas': { 'grid_label': 'gr' }
+        }
     ]
 
 
