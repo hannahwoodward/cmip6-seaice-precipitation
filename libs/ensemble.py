@@ -1,5 +1,5 @@
 import libs.analysis
-import libs.utils
+import libs.local
 import libs.plot
 import libs.vars
 import numpy as np
@@ -16,7 +16,7 @@ def get_and_preprocess(
 
     # Since variables have been regridded, can use UKESM areacello
     # for all ensemble member weighted means/sums
-    areacello = libs.utils.get_data('Ofx', 'piControl', 'UKESM1-0-LL', 'areacello', 'r1i1p1f2').areacello
+    areacello = libs.local.get_data('Ofx', 'piControl', 'UKESM1-0-LL', 'areacello', 'r1i1p1f2').areacello
     weight = areacello.fillna(0)
 
     # Get nsidc region mask, which has been regridded to UKESM ocean grid
@@ -31,14 +31,19 @@ def get_and_preprocess(
         source_id = item['source_id']
         variant_label = item['variant_label']
 
-        var_base = libs.utils.get_data(
-            component,
-            experiment,
-            source_id,
-            variable_id,
-            variant_label,
-            include_hist=True
-        )
+        kwargs = {
+            'component': component,
+            'experiment_id': experiment,
+            'source_id': source_id,
+            'variable_id': variable_id,
+            'variant_label': variant_label,
+            'include_hist': True
+        }
+
+        if variable_id in item:
+            kwargs = { **kwargs, **item[variable_id] }
+
+        var_base = libs.local.get_data(**kwargs)
 
         # Mask to arctic + nsidc regions
         var_base[variable_id] = var_base[variable_id]\

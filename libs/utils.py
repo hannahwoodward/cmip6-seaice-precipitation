@@ -341,53 +341,6 @@ def download_remote_files(item, local_path, headers, time_slice=None):
     return local_filenames
 
 
-def get_data(
-    component,
-    experiment_id,
-    source_id,
-    variable_id,
-    variant_label,
-    include_hist=False,
-    suffix=None
-):
-    '''
-    Function: get_data()
-        Load a UKESM1 output variable from a local path with xarray.
-        Format:
-        `_data/cmip6/{source_id}/{var}_{component}_{source_id}_{e_id}_{variant_id}_gn_{y}.nc`
-
-    Inputs:
-    - component (string): model components, e.g. 'Amon', 'SImon'
-    - experiment_id (string): model experiment, e.g. 'historical', 'ssp585'
-    - source_id (string): model family, e.g. 'UKESM1-0-LL'
-    - var (string): variable, e.g. 'pr', 'siconc'
-    - variant_label (string): model realisation, e.g. 'r2i1p1f2'
-
-    Outputs:
-    - (xarray): loaded data
-    '''
-    if suffix == None:
-        suffix = '' if variable_id in ['areacella', 'areacello'] else '_201501-210012_processed'
-
-    basepath = f'_data/cmip6/{source_id}/{variable_id}/'
-    filename = f'{variable_id}_{component}_{source_id}_{experiment_id}_{variant_label}_gn{suffix}.nc'
-    filepaths = [f'{basepath}{filename}']
-
-    if include_hist:
-        experiment_id = 'historical'
-        suffix = '_198001-201412_processed'
-
-        filename = f'{variable_id}_{component}_{source_id}_{experiment_id}_{variant_label}_gn{suffix}.nc'
-        filepaths.append(f'{basepath}{filename}')
-
-    for filepath in filepaths:
-        if not Path(filepath).exists():
-            print('Error 404', f'-> {filepath}', sep='\n')
-            return None
-
-    return xarray.open_mfdataset(paths=filepaths, combine='by_coords', use_cftime=True)
-
-
 def merge_nc_files(paths, output):
     '''
     Function merge_nc_files():
