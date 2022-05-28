@@ -398,7 +398,67 @@ def time_series(
         xmin = np.nanmin([xmin, data_x_min]) if xmin != None else data_x_min
         xmax = np.nanmax([xmax, data_x_max]) if xmax != None else data_x_max
 
-    ax.set(xlabel='Year', ylabel=ylabel),
+    ax.set(xlabel='Year', ylabel=ylabel)
+    ax.set_title('')
+    ax.grid()
+    ax.set_xlim(xmin, xmax)
+    yrange != None and ax.set_ylim(*yrange)
+
+    year_ticks = years
+    if xattr == 'time':
+        year_ticks = [cftime.Datetime360Day(y, 1, 1, 0, 0, 0) for y in years]
+    ax.set_xticks(year_ticks) #, years)
+    ax.set_xticklabels(years)
+    place_legend(fig, ax, len(data))
+
+
+def time_series_from_vars(
+    data,
+    title,
+    xattr,
+    ylabel,
+    process=lambda x: x,
+    variables=None,
+    years=np.arange(1980, 2101, 20),
+    yrange=None
+):
+    '''
+    Function: time_series()
+        Plot an array of time series on a single figure
+
+    Inputs:
+    - data (array): array of time series data to plot
+        format: [{ 'data': (xarray), 'label': (string) }]
+    - title (string): title of plot
+    - xattr (string): time attribute name, e.g. 'time', 'year'
+    - ylabel (string): y-axis label
+    - process (function): process data before plotting
+        default: lambda x: x
+    - years (array): list of years to show on x-axis ticks
+        default: np.arange(1980, 2101, 20)
+    - yrange (array): y-axis range
+        format: [min, max]
+        default: None
+
+    Outputs: None
+    '''
+    variables = variables if variables != None else list(data)
+    fig, ax = plt.subplots(figsize=(15, 7))
+    fig.suptitle(title)
+    xmin = None
+    xmax = None
+    for i, key in enumerate(variables):
+        label = key
+        color = data[key].attrs['color'] if 'color' in data[key].attrs else None
+        plot_kwargs = data[key].attrs['plot_kwargs'] if 'plot_kwargs' in data[key].attrs else {}
+        data_mod = process(data[key].copy())
+        data_mod.plot(ax=ax, label=label, color=color, **plot_kwargs)
+        data_x_min = np.nanmin(data_mod[xattr])
+        data_x_max = np.nanmax(data_mod[xattr])
+        xmin = np.nanmin([xmin, data_x_min]) if xmin != None else data_x_min
+        xmax = np.nanmax([xmax, data_x_max]) if xmax != None else data_x_max
+
+    ax.set(xlabel='Year', ylabel=ylabel)
     ax.set_title('')
     ax.grid()
     ax.set_xlim(xmin, xmax)

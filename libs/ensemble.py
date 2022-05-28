@@ -117,12 +117,11 @@ def monthly_variability_full(
         libs.plot.monthly_variability(ensemble_processed, **kwargs)
 
 
-def time_series_full_variability(ensemble_weighted_reduced, plot_kwargs):
-    for item in ensemble_weighted_reduced:
-        member = item['label']
+def time_series_full_variability(ensemble_series, plot_kwargs):
+    for member in list(ensemble_series):
         kwargs = dict(plot_kwargs)
         kwargs['title'] = kwargs['title'].format(member=member)
-        libs.plot.time_series([item], xattr='time', **kwargs)
+        libs.plot.time_series_from_vars(ensemble_series, xattr='time', variables=[member], **kwargs)
 
 
 def time_series_weighted(

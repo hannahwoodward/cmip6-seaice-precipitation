@@ -34,6 +34,27 @@ def calendar_division_mean(data, time, division='month'):
         .mean(dim=('time'), skipna=True)
 
 
+def climatology_monthly(data, date_start, date_end, relative=False):
+    baseline = data.sel(time=slice(date_start, date_end))
+    period = 'time.month'
+    climatology = baseline.groupby(period).mean('time')
+
+    if relative:
+        return ((100 * data.groupby(period) / climatology) - 100)
+
+    return (data.groupby(period) - climatology)
+
+
+'''
+def climatology_seasonal(arr, date_start, date_end, season):
+    baseline = arr[0].sel(time=slice(date_start, date_end))
+    period = 'time.season'
+    climatology = baseline.where(baseline.time[period] == season).mean('time')
+
+    return [x.where(x.time[period] == season) - climatology for x in arr]
+'''
+
+
 def ensemble_mean(ensemble):
     '''
     Function: ensemble_mean()
