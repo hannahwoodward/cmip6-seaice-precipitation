@@ -4,7 +4,6 @@ import cartopy.crs as ccrs
 import cftime
 import datetime
 import libs.analysis
-import libs.helpers as helpers
 import libs.vars
 import matplotlib
 import matplotlib.pyplot as plt
@@ -130,7 +129,7 @@ def monthly_variability_regional(
     mask_type='latlon',
     calc_ensemble_mean=False,
     process=lambda x: x,
-    ylim=None
+    yrange=None
 ):
     '''
     Function: monthly_variability_regional()
@@ -149,7 +148,7 @@ def monthly_variability_regional(
     - process (function): process data before plotting, input is
         arr item['data'] which has been already masked to region
         default: lambda x: x
-    - ylim (array): y-axis range e.g. [0, 5]
+    - yrange (array): y-axis range e.g. [0, 5]
         default: None
 
     Outputs: None
@@ -189,7 +188,7 @@ def monthly_variability_regional(
         ax = axs[i]
         monthly_variability_subplot(ensemble_masked, ax, region['label'], ylabel)
 
-    ylim != None and plt.setp(axs, ylim=ylim)
+    yrange != None and plt.setp(axs, ylim=yrange)
     place_legend(fig, axs[0], len(ensemble))
     fig.show()
 

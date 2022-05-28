@@ -291,7 +291,7 @@ def download_remote_files(item, local_path, headers, time_slice=None):
     '''
     item_id = item['id']
     item_index_node = item['index_node']
-    url = f'https://esgf-index1.ceda.ac.uk/search_files/{item_id}/{item_index_node}/'
+    url = f'https://esgf-index1.ceda.ac.uk/search_files/{item_id}/{item_index_node}/?limit=1000'
     req = urllib.request.Request(url, headers=headers)
     response = urllib.request.urlopen(req)
     if response.status < 200 or response.status > 299:
