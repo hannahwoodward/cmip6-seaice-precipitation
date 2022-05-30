@@ -70,9 +70,13 @@ def ensemble():
             'experiment_id': 'ssp585',
             'source_id': 'EC-Earth3',
             'variant_label': 'r4i1p1f1',
+            'evspsbl': { 'grid_label': 'gr' },
             'pr': { 'grid_label': 'gr' },
+            'pr_siconc': { 'grid_label': 'gr' },
             'prsn': { 'grid_label': 'gr' },
+            'prsn_siconc': { 'grid_label': 'gr' },
             'prra': { 'grid_label': 'gr' },
+            'prra_siconc': { 'grid_label': 'gr' },
             'tas': { 'grid_label': 'gr' }
         }
     ]
@@ -98,4 +102,135 @@ def nsidc_regions():
         { 'values': [12], 'label': 'Chukchi' },
         { 'values': [13], 'label': 'Beaufort' },
         { 'values': [15], 'label': 'Central' },
+    ]
+
+
+def preprocess_evspsbl(data, experiment, source_id, variant_label):
+    # Convert to s-1 => day-1
+    data *= 86400
+
+    # Fix inverted data
+    if source_id == 'EC-Earth3':
+        data *= -1
+
+    return data
+
+
+def preprocess_pr(data, experiment, source_id, variant_label):
+    # Convert to s-1 => day-1
+    return data * 86400
+
+
+def preprocess_tas(var_data, experiment, source_id, variant_label):
+    # Convert K -> C
+    return data - 273.15
+
+
+def variables():
+    return [
+        {
+            'component': 'SImon',
+            'text': 'sea-ice area',
+            'units': 'km²',
+            'variable_id': 'siconc',
+            'weighting_method': 'sum',
+            # Convert m2 => km2 and % to frac
+            'weighting_process': lambda x: x / (1000 * 1000 * 100)
+        },
+        {
+            'component': 'SImon',
+            'text': 'sea-ice mass',
+            'units': 'kg',
+            'variable_id': 'simass',
+            'weighting_method': 'sum',
+            'weighting_process': lambda x: x
+        },
+        {
+            'component': 'SImon',
+            'text': 'sea-ice thickness',
+            'units': 'm',
+            'variable_id': 'sithick',
+            'weighting_method': 'mean',
+            'weighting_process': lambda x: x
+        },
+        {
+            'component': 'SImon',
+            'text': 'sea-ice snow layer thickness',
+            'units': 'm',
+            'variable_id': 'sisnthick',
+            'weighting_method': 'mean',
+            'weighting_process': lambda x: x
+        },
+        {
+            'component': 'Amon',
+            'preprocess': preprocess_pr,
+            'text': 'precipitation over sea-ice and ocean',
+            'units': 'mm day⁻¹',
+            'variable_id': 'pr',
+            'weighting_method': 'mean',
+            'weighting_process': lambda x: x
+        },
+        {
+            'component': 'Amon',
+            'preprocess': preprocess_pr,
+            'text': 'snowfall over sea-ice and ocean',
+            'units': 'mm day⁻¹',
+            'variable_id': 'prsn',
+            'weighting_method': 'mean',
+            'weighting_process': lambda x: x
+        },
+        {
+            'component': 'Amon',
+            'preprocess': preprocess_pr,
+            'text': 'rainfall over sea-ice and ocean',
+            'units': 'mm day⁻¹',
+            'variable_id': 'prra',
+            'weighting_method': 'mean',
+            'weighting_process': lambda x: x
+        },
+        {
+            'component': 'Amon',
+            'preprocess': preprocess_pr,
+            'text': 'precipitation over sea-ice',
+            'units': 'mm day⁻¹',
+            'variable_id': 'pr_siconc',
+            'weighting_method': 'mean',
+            'weighting_process': lambda x: x
+        },
+        {
+            'component': 'Amon',
+            'preprocess': preprocess_pr,
+            'text': 'snowfall over sea-ice',
+            'units': 'mm day⁻¹',
+            'variable_id': 'prsn_siconc',
+            'weighting_method': 'mean',
+            'weighting_process': lambda x: x
+        },
+        {
+            'component': 'Amon',
+            'preprocess': preprocess_pr,
+            'text': 'rainfall over sea-ice',
+            'units': 'mm day⁻¹',
+            'variable_id': 'prra_siconc',
+            'weighting_method': 'mean',
+            'weighting_process': lambda x: x
+        },
+        {
+            'component': 'Amon',
+            'preprocess': preprocess_tas,
+            'text': 'surface air temperature over sea-ice and ocean',
+            'units': '°C',
+            'variable_id': 'tas',
+            'weighting_method': 'mean',
+            'weighting_process': lambda x: x
+        },
+         {
+            'component': 'Amon',
+            'preprocess': preprocess_evspsbl,
+            'text': 'evaporation and sublimation over sea-ice and ocean',
+            'units': 'mm day⁻¹',
+            'variable_id': 'evspsbl',
+            'weighting_method': 'mean',
+            'weighting_process': lambda x: x
+        }
     ]

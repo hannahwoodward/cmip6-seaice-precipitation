@@ -4,6 +4,7 @@ import libs.plot
 import libs.vars
 import numpy as np
 import xarray
+xarray.set_options(keep_attrs=True);
 
 
 def get_and_preprocess(
@@ -50,6 +51,9 @@ def get_and_preprocess(
             .where(var_base[variable_id].latitude > 60)\
             .where(np.isin(nsidc_mask.values, nsidc_all['values']))
 
+        var_base[variable_id].attrs['label'] = var_base.attrs['source_id']
+        var_base[variable_id].attrs['color'] = item['color']
+
         ensemble[i]['data'] = preprocess(
             var_base[variable_id],
             experiment,
@@ -59,62 +63,6 @@ def get_and_preprocess(
         ensemble[i]['label'] = var_base.attrs['source_id']
 
     return ensemble, weight
-
-
-def monthly_variability_regional(
-    ensemble_time_slices,
-    plot_kwargs,
-    weight,
-    weighting_method,
-    weighting_process
-):
-    for s in ensemble_time_slices:
-        s_label = s['label']
-        kwargs = dict(plot_kwargs)
-        kwargs['title'] = kwargs['title'].format(s_label=s_label)
-
-        libs.plot.monthly_variability_regional(
-            s['ensemble'],
-            calc_ensemble_mean=True,
-            mask_type='ocean',
-            process=lambda x: libs.analysis.monthly_weighted(
-                weighting_process(x),
-                weight,
-                method=weighting_method
-            ),
-            **kwargs
-        )
-
-        print(' ')
-
-
-def monthly_variability_full(
-    ensemble_time_slices,
-    plot_kwargs,
-    weight,
-    weighting_method,
-    weighting_process,
-    calc_ensemble_mean=True,
-):
-    for s in ensemble_time_slices:
-        ensemble_processed = [{
-            'color': item['color'],
-            'data': libs.analysis.monthly_weighted(
-                weighting_process(item['data']),
-                weight,
-                method=weighting_method
-            ),
-            'label': item['label'],
-            'plot_kwargs': item['plot_kwargs'] if 'plot_kwargs' in item else {}
-        } for item in s['ensemble']]
-
-        # Calculate and add ensemble mean
-        calc_ensemble_mean and ensemble_processed.append(libs.analysis.ensemble_mean(ensemble_processed))
-
-        s_label = s['label']
-        kwargs = dict(plot_kwargs)
-        kwargs['title'] = kwargs['title'].format(s_label=s_label)
-        libs.plot.monthly_variability(ensemble_processed, **kwargs)
 
 
 def time_series_full_variability(ensemble_series, plot_kwargs):

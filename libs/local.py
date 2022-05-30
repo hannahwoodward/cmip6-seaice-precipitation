@@ -1,4 +1,5 @@
 from pathlib import Path
+import libs.vars
 import xarray
 
 
@@ -56,7 +57,23 @@ def get_data(
     return xarray.open_mfdataset(paths=filepaths, combine='by_coords', use_cftime=True)
 
 
-def get_ensemble_series(variable_id, experiment, suffix=''):
-    time_series_path = f'_data/_cache/{variable_id}/{variable_id}_{experiment}_198001-210012{suffix}.nc'
+def get_ensemble_regional_series(variable_id, experiment, suffix=''):
+    return [get_ensemble_series(
+        variable_id,
+        experiment,
+        region=r['label'],
+        suffix=suffix
+    ) for r in libs.vars.nsidc_regions() if len(r['values']) == 1]
 
-    return xarray.open_mfdataset(paths=time_series_path, combine='by_coords', use_cftime=True)
+
+def get_ensemble_series(variable_id, experiment, region='All', suffix=''):
+    time_series_filename = f'{variable_id}_{experiment}_{region}_198001-210012{suffix}.nc'
+    time_series_path = f'_data/_cache/{variable_id}/{time_series_filename}'
+
+    data = xarray.open_mfdataset(paths=time_series_path, combine='by_coords', use_cftime=True)
+
+    for variable in list(data):
+        if 'label' not in data[variable].attrs:
+            data[variable].attrs['label'] = variable
+
+    return data

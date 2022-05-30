@@ -94,113 +94,74 @@ def calendar_division_spatial(
 
 
 def monthly_variability(
-    arr,
+    data,
     title,
     ylabel,
+    variables=None,
     yrange=None
 ):
     '''
     Function: monthly_variability()
-        Plot an array of data with monthly averages on a single figure
+        Plot a selection of data array variables
+        with monthly averages on a single figure
 
     Inputs:
-    - data (array): array of time series data to plot
-        format: [{ 'data': (xarray), 'label': (string) }]
+    - data (xarray or list(xarray)):
+        DataArray/DataSet of time series data to plot.
+        Optional used attrs: 'label', 'color'
     - title (string): title of plot
     - ylabel (string): y-axis label
     - yrange (array): y-axis range
-        format: [min, max]
+        format: (min, max)
         default: None
 
     Outputs: None
     '''
+    if type(data) != list:
+        data = [data]
+
+    variables = variables if variables != None else list(data[0])
+    arr = [item[v] for item in data for v in variables]
+
     fig, ax = plt.subplots(figsize=(15, 7))
     fig.suptitle(title)
     yrange != None and ax.set_ylim(*yrange)
     monthly_variability_subplot(arr, ax, '', ylabel)
-    place_legend(fig, ax, len(arr))
+    place_legend(fig, ax, len(variables))
     fig.show()
 
 
 def monthly_variability_regional(
-    ensemble,
+    arr,
     title,
     ylabel,
-    mask_type='latlon',
-    calc_ensemble_mean=False,
-    process=lambda x: x,
+    variables=None,
     yrange=None
 ):
-    '''
-    Function: monthly_variability_regional()
-        Mask ensemble data to nsidc regions and plot monthly variability
-
-    Inputs:
-    - arr (xarray): array of data in format
-        [{ 'label': (string), 'data': (xarray) }, ...]
-    - title (string): axis title
-    - ylabel (string): y-axis label
-    - mask_type (string): whether to load mask on ocean or latlon grid
-        allowed values: 'latlon', 'ocean'
-        default: 'latlon'
-    - calc_ensemble_mean (bool): whether to calculate ensemble mean
-        default: False
-    - process (function): process data before plotting, input is
-        arr item['data'] which has been already masked to region
-        default: lambda x: x
-    - yrange (array): y-axis range e.g. [0, 5]
-        default: None
-
-    Outputs: None
-
-    TODO:
-    - color
-    - automate ylim
-    - legend below subplots?
-    '''
-    # Get all individual regions
-    regions = [r for r in libs.vars.nsidc_regions() if len(r['values']) == 1]
-    path_nsidc_mask = '_data/_cache/NSIDC_Regions_Masks_LatLon_nearest_s2d.nc'
-    if mask_type == 'ocean':
-        path_nsidc_mask = '_data/_cache/NSIDC_Regions_Masks_Ocean_nearest_s2d.nc'
-
-    nsidc_mask = xarray.open_mfdataset(paths=path_nsidc_mask, combine='by_coords').mask
-
-    if mask_type == 'latlon':
-        nsidc_mask = nsidc_mask.roll(x=96, roll_coords=True)
-
+    variables = variables if variables != None else list(arr[0])
     fig, axs = plt.subplots(3, 3, figsize=(15, 15))
     axs = axs.flatten()
     fig.suptitle(title)
 
-    for i, region in enumerate(regions):
-        ensemble_masked = [{
-            'color': item['color'],
-            'data': process(
-                item['data'].where(np.isin(nsidc_mask.values, region['values']))
-            ),
-            'label': item['label']
-        } for item in ensemble]
-
-        if calc_ensemble_mean:
-            ensemble_masked.append(libs.analysis.ensemble_mean(ensemble_masked))
-
+    for i, regional_data in enumerate(arr):
         ax = axs[i]
-        monthly_variability_subplot(ensemble_masked, ax, region['label'], ylabel)
+        regional_label = regional_data.attrs['region']
+        regional_arr = [regional_data[v] for v in variables]
+        monthly_variability_subplot(regional_arr, ax, regional_label, ylabel)
 
     yrange != None and plt.setp(axs, ylim=yrange)
-    place_legend(fig, axs[0], len(ensemble))
+    place_legend(fig, axs[0], len(variables))
     fig.show()
 
 
-def monthly_variability_subplot(data, ax, title, ylabel):
+def monthly_variability_subplot(arr, ax, title, ylabel):
     '''
     Function: monthly_variability_subplot()
         Plot an array of data on a given axis with
         monthly averages on a single figure
 
     Inputs:
-    - data (array): array of time series data to plot
+    - arr (array): array of time series data to plot
         format: [{ 'data': (xarray), 'label': (string) }]
     - ax (matplotlib.pyplot.axis): axis on which to plot
     - title (string): axis title
@@ -208,10 +169,11 @@ def monthly_variability_subplot(data, ax, title, ylabel):
 
     Outputs: None
     '''
-    for i, item in enumerate(data):
-        color = item['color'] if 'color' in item else None
-        plot_kwargs = item['plot_kwargs'] if 'plot_kwargs' in item else {}
-        item['data'].plot(ax=ax, label=item['label'], color=color, **plot_kwargs)
+    for item in arr:
+        color = item.attrs['color'] if 'color' in item.attrs else None
+        label = item.attrs['label'] if 'label' in item.attrs else None
+        plot_kwargs = item.attrs['plot_kwargs'] if 'plot_kwargs' in item.attrs else {}
+        item.plot(ax=ax, label=label, color=color, **plot_kwargs)
 
     ax.grid()
     ax.set_xlim(1, 12)
@@ -427,13 +389,14 @@ def time_series_from_vars(
         Plot an array of time series on a single figure
 
     Inputs:
-    - data (array): array of time series data to plot
-        format: [{ 'data': (xarray), 'label': (string) }]
+    - data (DataArray/DataSet or Array of DataArray/DataSet):
+        array of time series data to plot
     - title (string): title of plot
     - xattr (string): time attribute name, e.g. 'time', 'year'
     - ylabel (string): y-axis label
     - process (function): process data before plotting
         default: lambda x: x
+    - variables (array)
     - years (array): list of years to show on x-axis ticks
         default: np.arange(1980, 2101, 20)
     - yrange (array): y-axis range
@@ -442,21 +405,25 @@ def time_series_from_vars(
 
     Outputs: None
     '''
-    variables = variables if variables != None else list(data)
+    if type(data) != list:
+        data = [data]
+
+    variables = variables if variables != None else list(data[0])
     fig, ax = plt.subplots(figsize=(15, 7))
     fig.suptitle(title)
     xmin = None
     xmax = None
     for i, key in enumerate(variables):
-        label = key
-        color = data[key].attrs['color'] if 'color' in data[key].attrs else None
-        plot_kwargs = data[key].attrs['plot_kwargs'] if 'plot_kwargs' in data[key].attrs else {}
-        data_mod = process(data[key].copy())
-        data_mod.plot(ax=ax, label=label, color=color, **plot_kwargs)
-        data_x_min = np.nanmin(data_mod[xattr])
-        data_x_max = np.nanmax(data_mod[xattr])
-        xmin = np.nanmin([xmin, data_x_min]) if xmin != None else data_x_min
-        xmax = np.nanmax([xmax, data_x_max]) if xmax != None else data_x_max
+        for item in data:
+            label = key
+            color = item[key].attrs['color'] if 'color' in item[key].attrs else None
+            plot_kwargs = item[key].attrs['plot_kwargs'] if 'plot_kwargs' in item[key].attrs else {}
+            item_mod = process(item[key].copy())
+            item_mod.plot(ax=ax, label=label, color=color, **plot_kwargs)
+            item_x_min = np.nanmin(item_mod[xattr])
+            item_x_max = np.nanmax(item_mod[xattr])
+            xmin = np.nanmin([xmin, item_x_min]) if xmin != None else item_x_min
+            xmax = np.nanmax([xmax, item_x_max]) if xmax != None else item_x_max
 
     ax.set(xlabel='Year', ylabel=ylabel)
     ax.set_title('')
@@ -469,4 +436,4 @@ def time_series_from_vars(
         year_ticks = [cftime.Datetime360Day(y, 1, 1, 0, 0, 0) for y in years]
     ax.set_xticks(year_ticks) #, years)
     ax.set_xticklabels(years)
-    place_legend(fig, ax, len(data))
+    place_legend(fig, ax, len(variables))
