@@ -1,4 +1,5 @@
 import datetime
+import libs.plot
 import libs.vars
 import xarray
 xarray.set_options(keep_attrs=True);
@@ -55,6 +56,58 @@ def climatology_seasonal(arr, date_start, date_end, season):
 
     return [x.where(x.time[period] == season) - climatology for x in arr]
 '''
+
+
+def correlation_spatial_clim(
+    ensemble_a,
+    ensemble_b,
+    climatology_period=slice('1980-01-01', '2011-01-01'),
+    seasons=['DJF', 'MAM', 'JJA', 'SON']
+):
+    var_a_name = ensemble_a[0]['data'].name
+    var_b_name = ensemble_b[0]['data'].name
+
+    for s in seasons:
+        ensemble_data = []
+
+        for i, item in enumerate(ensemble_a):
+            baseline_a = item['data']\
+                .sel(time=climatology_period)\
+                .where(item['data'].time['time.season'] == s)\
+                .mean('time')
+
+            item_a = item['data']\
+                .where(item['data'].time['time.season'] == s) - baseline_a
+
+            baseline_b = ensemble_b[i]['data']\
+                .sel(time=climatology_period)\
+                .where(ensemble_b[i]['data'].time['time.season'] == s)\
+                .mean('time')
+
+            item_b = ensemble_b[i]['data']\
+                .where(ensemble_b[i]['data'].time['time.season'] == s) - baseline_b
+
+            ensemble_data.append({
+                'data': xarray.corr(item_a, item_b, dim='time'),
+                'label': item['source_id']
+            })
+
+
+        libs.plot.nstereo(
+            ensemble_data,
+            title=f'{s} {var_a_name}/{var_b_name} correlation (climatology 1980-2010)',
+            colorbar_label='Correlation',
+            colormesh_kwargs={
+                'cmap': 'RdBu_r',
+                'extend': 'neither',
+                'levels': 21,
+                'vmin': -1,
+                'vmax': 1,
+                'x': 'longitude',
+                'y': 'latitude'
+            },
+            shape=(1, len(ensemble_data))
+        )
 
 
 def ensemble_mean(ensemble):
