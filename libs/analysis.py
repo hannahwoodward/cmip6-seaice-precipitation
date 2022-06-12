@@ -43,7 +43,7 @@ def climatology_monthly(data, date_start, date_end, relative=False):
     climatology = baseline.groupby(period).mean('time')
 
     if relative:
-        return ((100 * data.groupby(period) / climatology) - 100)
+        return 100 * ((data.groupby(period) / climatology) - 1)
 
     return (data.groupby(period) - climatology)
 
