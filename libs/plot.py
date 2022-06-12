@@ -97,6 +97,7 @@ def monthly_variability(
     data,
     title,
     ylabel,
+    legend_below=False,
     variables=None,
     yrange=None
 ):
@@ -121,13 +122,13 @@ def monthly_variability(
         data = [data]
 
     variables = variables if variables != None else list(data[0])
-    arr = [item[v] for item in data for v in variables]
+    arr = [item[v] for item in data for v in variables if v in item]
 
     fig, ax = plt.subplots(figsize=(15, 7))
     fig.suptitle(title)
     yrange != None and ax.set_ylim(*yrange)
     monthly_variability_subplot(arr, ax, '', ylabel)
-    place_legend(fig, ax, len(variables))
+    place_legend(fig, ax, len(variables), legend_below)
     fig.show()
 
 
@@ -135,22 +136,25 @@ def monthly_variability_regional(
     arr,
     title,
     ylabel,
+    legend_below=False,
     variables=None,
     yrange=None
 ):
-    variables = variables if variables != None else list(arr[0])
+    arr0 = arr[0][0] if type(arr[0]) == list else arr[0]
+    variables = variables if variables != None else list(arr0)
     fig, axs = plt.subplots(3, 3, figsize=(15, 15))
     axs = axs.flatten()
     fig.suptitle(title)
 
     for i, regional_data in enumerate(arr):
         ax = axs[i]
-        regional_label = regional_data.attrs['region']
-        regional_arr = [regional_data[v] for v in variables]
+        regional_data = regional_data if type(regional_data) == list else [regional_data]
+        regional_label = regional_data[0].attrs['region']
+        regional_arr = [item[v] for item in regional_data for v in variables]
         monthly_variability_subplot(regional_arr, ax, regional_label, ylabel)
 
     yrange != None and plt.setp(axs, ylim=yrange)
-    place_legend(fig, axs[0], len(variables))
+    place_legend(fig, axs[0], len(variables), legend_below)
     fig.show()
 
 
@@ -273,7 +277,7 @@ def nstereo(
     fig.show()
 
 
-def place_legend(fig, ax, data_size):
+def place_legend(fig, ax, data_size, force_below=False):
     '''
     Function: place_legend()
         Automatically place legend based on data (i.e. ensemble) size.
@@ -290,7 +294,7 @@ def place_legend(fig, ax, data_size):
 
     Outputs: None
     '''
-    if data_size > 1:
+    if force_below or data_size > 1:
         handles = []
         labels = []
         # Remove duplicate labels
@@ -301,7 +305,7 @@ def place_legend(fig, ax, data_size):
                     handles.append(a_handles[i])
                     labels.append(label)
 
-        legend_ncol = np.min([data_size, 5])
+        legend_ncol = np.min([len(labels), 5])
         fig.legend(
             handles=handles,
             labels=labels,
