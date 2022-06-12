@@ -77,7 +77,8 @@ def ensemble():
             'prsn_siconc': { 'grid_label': 'gr' },
             'prra': { 'grid_label': 'gr' },
             'prra_siconc': { 'grid_label': 'gr' },
-            'tas': { 'grid_label': 'gr' }
+            'tas': { 'grid_label': 'gr' },
+            'tas_siconc': { 'grid_label': 'gr' }
         }
     ]
 
@@ -121,7 +122,7 @@ def preprocess_pr(data, experiment, source_id, variant_label):
     return data * 86400
 
 
-def preprocess_tas(var_data, experiment, source_id, variant_label):
+def preprocess_tas(data, experiment, source_id, variant_label):
     # Convert K -> C
     return data - 273.15
 
@@ -224,7 +225,16 @@ def variables():
             'weighting_method': 'mean',
             'weighting_process': lambda x: x
         },
-         {
+        {
+            'component': 'Amon',
+            'preprocess': preprocess_tas,
+            'text': 'surface air temperature over sea-ice',
+            'units': '°C',
+            'variable_id': 'tas_siconc',
+            'weighting_method': 'mean',
+            'weighting_process': lambda x: x
+        },
+        {
             'component': 'Amon',
             'preprocess': preprocess_evspsbl,
             'text': 'evaporation and sublimation over sea-ice and ocean',
