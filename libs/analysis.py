@@ -62,6 +62,7 @@ def correlation_spatial_clim(
     ensemble_a,
     ensemble_b,
     climatology_period=slice('1980-01-01', '2011-01-01'),
+    correlation_period=None,
     seasons=['DJF', 'MAM', 'JJA', 'SON']
 ):
     var_a_name = ensemble_a[0]['data'].name
@@ -86,6 +87,10 @@ def correlation_spatial_clim(
 
             item_b = ensemble_b[i]['data']\
                 .where(ensemble_b[i]['data'].time['time.season'] == s) - baseline_b
+
+            if correlation_period != None:
+                item_a = item_a.sel(time=correlation_period)
+                item_b = item_b.sel(time=correlation_period)
 
             ensemble_data.append({
                 'data': xarray.corr(item_a, item_b, dim='time'),
