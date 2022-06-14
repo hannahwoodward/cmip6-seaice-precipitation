@@ -122,7 +122,7 @@ def preprocess_pr(data, experiment, source_id, variant_label):
     return data * 86400
 
 
-def preprocess_tas(data, experiment, source_id, variant_label):
+def preprocess_temp(data, experiment, source_id, variant_label):
     # Convert K -> C
     return data - 273.15
 
@@ -218,7 +218,7 @@ def variables():
         },
         {
             'component': 'Amon',
-            'preprocess': preprocess_tas,
+            'preprocess': preprocess_temp,
             'text': 'surface air temperature over sea-ice and ocean',
             'units': '°C',
             'variable_id': 'tas',
@@ -227,7 +227,7 @@ def variables():
         },
         {
             'component': 'Amon',
-            'preprocess': preprocess_tas,
+            'preprocess': preprocess_temp,
             'text': 'surface air temperature over sea-ice',
             'units': '°C',
             'variable_id': 'tas_siconc',
@@ -240,6 +240,24 @@ def variables():
             'text': 'evaporation and sublimation over sea-ice and ocean',
             'units': 'mm day⁻¹',
             'variable_id': 'evspsbl',
+            'weighting_method': 'mean',
+            'weighting_process': lambda x: x
+        },
+        {
+            'component': 'Omon',
+            'preprocess': preprocess_temp,
+            'text': 'sea surface temperature',
+            'units': '°C',
+            'variable_id': 'tos',
+            'weighting_method': 'mean',
+            'weighting_process': lambda x: x
+        },
+        {
+            'component': 'Omon',
+            'preprocess': preprocess_temp,
+            'text': 'sea surface temperature under sea-ice',
+            'units': '°C',
+            'variable_id': 'tos_siconc',
             'weighting_method': 'mean',
             'weighting_process': lambda x: x
         }
