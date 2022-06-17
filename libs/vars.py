@@ -173,6 +173,39 @@ def variables():
             'weighting_process': lambda x: x
         },
         {
+            'component': 'SImon',
+            'text': 'sea-ice melt pond concentration',
+            'units': '%',
+            'variable_id': 'simpconc',
+            'weighting_method': 'mean',
+            'weighting_process': lambda x: x
+        },
+        {
+            'component': 'SImon',
+            'text': 'sea-ice melt pond area',
+            'units': 'km²',
+            'variable_id': 'simpconc_area',
+            'weighting_method': 'sum',
+            # Convert m2 => km2 and % to frac
+            'weighting_process': lambda x: x / (1000 * 1000 * 100)
+        },
+#         {
+#             'component': 'SImon',
+#             'text': 'thickness of melt pond',
+#             'units': 'm',
+#             'variable_id': 'simpmass',
+#             'weighting_method': 'mean',
+#             'weighting_process': lambda x: x
+#         },
+#         {
+#             'component': 'SImon',
+#             'text': 'thickness of refrozen ice on melt pond',
+#             'units': 'm',
+#             'variable_id': 'simprefrozen',
+#             'weighting_method': 'mean',
+#             'weighting_process': lambda x: x
+#         },
+        {
             'component': 'Amon',
             'preprocess': preprocess_pr,
             'text': 'precipitation over sea-ice and ocean',
