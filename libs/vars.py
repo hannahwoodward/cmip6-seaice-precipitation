@@ -288,7 +288,6 @@ def variables():
         },
         {
             'component': 'Omon',
-            'preprocess': preprocess_temp,
             'text': 'sea surface temperature',
             'units': '°C',
             'variable_id': 'tos',
@@ -297,7 +296,6 @@ def variables():
         },
         {
             'component': 'Omon',
-            'preprocess': preprocess_temp,
             'text': 'sea surface temperature under sea-ice',
             'units': '°C',
             'variable_id': 'tos_siconc',
