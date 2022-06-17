@@ -63,30 +63,31 @@ def correlation_spatial_clim(
     ensemble_b,
     climatology_period=slice('1980-01-01', '2011-01-01'),
     correlation_period=None,
-    seasons=['DJF', 'MAM', 'JJA', 'SON']
+    division='season',
+    periods=['DJF', 'MAM', 'JJA', 'SON']
 ):
     var_a_name = ensemble_a[0]['data'].name
     var_b_name = ensemble_b[0]['data'].name
 
-    for s in seasons:
+    for p in periods:
         ensemble_data = []
 
         for i, item in enumerate(ensemble_a):
             baseline_a = item['data']\
                 .sel(time=climatology_period)\
-                .where(item['data'].time['time.season'] == s)\
+                .where(item['data'].time[f'time.{division}'] == p)\
                 .mean('time')
 
             item_a = item['data']\
-                .where(item['data'].time['time.season'] == s) - baseline_a
+                .where(item['data'].time[f'time.{division}'] == p) - baseline_a
 
             baseline_b = ensemble_b[i]['data']\
                 .sel(time=climatology_period)\
-                .where(ensemble_b[i]['data'].time['time.season'] == s)\
+                .where(ensemble_b[i]['data'].time[f'time.{division}'] == p)\
                 .mean('time')
 
             item_b = ensemble_b[i]['data']\
-                .where(ensemble_b[i]['data'].time['time.season'] == s) - baseline_b
+                .where(ensemble_b[i]['data'].time[f'time.{division}'] == p) - baseline_b
 
             if correlation_period != None:
                 item_a = item_a.sel(time=correlation_period)
@@ -100,7 +101,7 @@ def correlation_spatial_clim(
 
         libs.plot.nstereo(
             ensemble_data,
-            title=f'{s} {var_a_name}/{var_b_name} correlation (climatology 1980-2010)',
+            title=f'{p} {var_a_name}/{var_b_name} correlation (climatology 1980-2010)',
             colorbar_label='Correlation',
             colormesh_kwargs={
                 'cmap': 'RdBu_r',
