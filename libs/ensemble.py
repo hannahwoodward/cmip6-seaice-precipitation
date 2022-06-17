@@ -45,6 +45,11 @@ def get_and_preprocess(
             kwargs = { **kwargs, **item[variable_id] }
 
         var_base = libs.local.get_data(**kwargs)
+        if type(var_base) not in [
+            xarray.core.dataarray.DataArray,
+            xarray.core.dataset.Dataset
+        ]:
+            continue
 
         # Mask to arctic + nsidc regions
         var_base[variable_id] = var_base[variable_id]\
@@ -61,6 +66,8 @@ def get_and_preprocess(
             variant_label
         )
         ensemble[i]['label'] = var_base.attrs['source_id']
+
+    ensemble = [item for item in ensemble if 'data' in item]
 
     return ensemble, weight
 
