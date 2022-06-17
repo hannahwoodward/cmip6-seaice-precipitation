@@ -336,10 +336,11 @@ def place_legend(fig, ax, data_size, cols=None, force_below=False):
                     labels.append(label)
 
         legend_ncol = cols if cols != None else np.min([len(labels), 6])
+        bbox_y = -0.1 if len(fig.axes) > 1 else -0.15
         fig.legend(
             handles=handles,
             labels=labels,
-            bbox_to_anchor=(0.5, -0.1),
+            bbox_to_anchor=(0.5, bbox_y),
             fontsize=15,
             loc='lower center',
             ncol=legend_ncol
