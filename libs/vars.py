@@ -64,6 +64,16 @@ def ensemble():
             'source_id': 'ACCESS-CM2',
             'variant_label': 'r1i1p1f1',
         }, {
+        #    'color': '#9b2226',
+        #    'experiment_id': 'ssp585',
+        #    'source_id': 'GISS-E2-1-G',
+        #    'variant_label': 'r1i1p5f1',
+        #}, {
+        #    'color': '#bb3e03',
+        #    'experiment_id': 'ssp585',
+        #    'source_id': 'GISS-E2-2-G',
+        #    'variant_label': 'r1i1p3f1',
+        #}, {
         # #F94144 #F3722C #577590 #4267AC #565AA0 #6A4C93
         #    # missing: No explicit lateral melt
             'color': '#FFCA3A',
