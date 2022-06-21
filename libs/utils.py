@@ -176,7 +176,7 @@ def download_variable(
 
         date_out_of_bounds = False
         if time_slice != None:
-            test_date_bounds(
+            date_out_of_bounds = test_date_bounds(
                 time_slice,
                 test_start=datetime.strptime(item['datetime_start'], '%Y-%m-%dT%H:%M:%SZ'),
                 test_stop=datetime.strptime(item['datetime_stop'], '%Y-%m-%dT%H:%M:%SZ')
