@@ -119,11 +119,6 @@ def download_variable(
         default: None
     - save_to_local (bool): whether to download files to local
         default: False
-
-    TODO:
-    - Incorporate time_slice with ceda query, example response:
-        "datetime_start":"1850-01-16T00:00:00Z",
-        "datetime_stop":"2014-12-16T00:00:00Z"
     '''
     base_url = 'https://esgf-index1.ceda.ac.uk/esg-search/search/'
     query = {
@@ -298,8 +293,7 @@ def download_remote_files(item, local_path, headers, time_slice=None):
         msg = '\n'.join([
             f'An error occurred making request:',
             f'-> URL: {url}',
-            f'-> Status code: {response.status}',
-            #f'-> Reason: {response.reason}'
+            f'-> Status code: {response.status}'
         ])
         raise ConnectionError(msg)
 
