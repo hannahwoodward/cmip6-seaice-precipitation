@@ -44,6 +44,7 @@ The following notebooks must be processed in this order before running any other
 ## Useful links
 
 - [CMIP6 data search](https://esgf-node.llnl.gov/search/cmip6/)
+- [CEDA CMIP6 catalogue](https://data.ceda.ac.uk/badc/cmip6)
 - [Ensemble members](https://github.com/hannahwoodward/cmip6-seaice-precipitation/blob/5b977709929f503c07c84979dbf1dbfd1b8186f7/libs/vars.py#L26)
 - [NSIDC regions](https://github.com/hannahwoodward/cmip6-seaice-precipitation/blob/5b977709929f503c07c84979dbf1dbfd1b8186f7/libs/vars.py#L96)
 - [Variables](https://github.com/hannahwoodward/cmip6-seaice-precipitation/blob/5b977709929f503c07c84979dbf1dbfd1b8186f7/libs/vars.py#L140)
