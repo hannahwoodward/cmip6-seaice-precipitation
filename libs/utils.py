@@ -39,8 +39,7 @@ def convert_to_360_day(i):
         o_time.values[i] = cftime.Datetime360Day(
             time.year,
             time.month,
-            16,
-            has_year_zero=time.has_year_zero
+            16 #, has_year_zero=time.has_year_zero
         )
 
     o = o.assign_coords({ 'time': o_time })
