@@ -27,9 +27,14 @@ def compress_nc_file(path, output, options=['-7 -L 1']):
     Output:
         - (string): compressed file path (same as output)
     '''
+    size_old = Path(path).stat().st_size
     nco = Nco()
     nco.ncks(input=str(path), output=str(output), options=options)
-    return output
+    size_new = Path(output).stat().st_size
+    diff = (1 - size_new / size_old) * 100
+    diff_str = f'{diff:.2f}%'
+
+    return output, diff_str
 
 
 def convert_to_360_day(i):
@@ -262,8 +267,8 @@ def download_variable(
         print('   -> Saved to disk')
 
         # Finally, compress as to_netcdf() seems to produce large file sizes
-        combined_path = compress_nc_file(combined_path, combined_path)
-        print('   -> Compressed')
+        combined_path, diff = compress_nc_file(combined_path, combined_path)
+        print(f'   -> Compressed ({diff})')
 
         # Delete temporary _merged.nc
         Path(merged_file_path).unlink()
