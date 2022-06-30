@@ -24,59 +24,58 @@ def default_time_slices():
 
 
 def ensemble():
+    # unstructured mesh, only daily data
+    #    'color': '#FF924C',
+    #    'experiment_id': 'ssp585',
+    #    'source_id': 'AWI-CM-1-1-MR',
+    #    'variant_label': 'r1i1p1f1',
+    # }, {
+    # no siconc (has siconca)
+    #    'color': '#9b2226',
+    #    'experiment_id': 'ssp585',
+    #    'source_id': 'GISS-E2-1-G',
+    #    'variant_label': 'r1i1p5f1',
+    #}, {
+    # no siconc (has siconca)
+    #    'color': '#bb3e03',
+    #    'experiment_id': 'ssp585',
+    #    'source_id': 'GISS-E2-2-G',
+    #    'variant_label': 'r1i1p3f1',
+    #}, {
+    # no historical prsn!
+    #    'color': '#ff924c',
+    #    'experiment_id': 'ssp585',
+    #    'source_id': 'CESM2-WACCM',
+    #    'variant_label': 'r4i1p1f1',
+    #}, {
+    #    'experiment_id': 'ssp585',
+    #    'source_id': 'CESM2',
+    #   'variant_label': 'r4i1p1f1',
+    #}, {
+    # not included in keen et al. 2021, poor sea-ice representation
+    #    'color': None,
+    #    'experiment_id': 'ssp585',
+    #    'source_id': 'CMCC-ESM2',
+    #    'variant_label': 'r1i1p1f1',
+    #}, {
+    # #F94144 #F3722C #577590 #4267AC #565AA0 #6A4C93
+    # green 8ac926
     return [
         {
-            'areacello_variant_label': 'r1i1p1f2',
-            'color': '#1982C4',
-            'experiment_id': 'ssp585',
-            'source_id': 'UKESM1-0-LL',
-            'variant_label': 'r2i1p1f2'
-        }, {
-            'color': '#43AA8B',
-            'experiment_id': 'ssp585',
-            'source_id': 'NorESM2-LM',
-            'variant_label': 'r1i1p1f1',
-        }, {
-        # NB currently status 404
-        #    'experiment_id': 'ssp585',
-        #    'source_id': 'CESM2-WACCM',
-        #    'variant_label': 'r4i1p1f1',
-        #}, {
-        #    'experiment_id': 'ssp585',
-        #    'source_id': 'CESM2',
-        #   'variant_label': 'r4i1p1f1',
-        #}, {
-            # missing: sipr, dynamics, frazil, lateral melt, evapsubl
-            'color': '#90BE6D',
-            'experiment_id': 'ssp585',
-            'source_id': 'CanESM5',
-            'variant_label': 'r1i1p2f1',
-        }, {
-        # not included in keen et al. 2021
-        #    'color': None,
-        #    'experiment_id': 'ssp585',
-        #    'source_id': 'CMCC-ESM2',
-        #    'variant_label': 'r1i1p1f1',
-        #}, {
             # No explicit lateral melt or frazil ice formation
-            'color': '#FF924C',
+            'color': '#f28c87',
             'experiment_id': 'ssp585',
             'source_id': 'ACCESS-CM2',
             'variant_label': 'r1i1p1f1',
         }, {
-        #    'color': '#9b2226',
-        #    'experiment_id': 'ssp585',
-        #    'source_id': 'GISS-E2-1-G',
-        #    'variant_label': 'r1i1p5f1',
-        #}, {
-        #    'color': '#bb3e03',
-        #    'experiment_id': 'ssp585',
-        #    'source_id': 'GISS-E2-2-G',
-        #    'variant_label': 'r1i1p3f1',
-        #}, {
-        # #F94144 #F3722C #577590 #4267AC #565AA0 #6A4C93
-        #    # missing: No explicit lateral melt
-            'color': '#FFCA3A',
+            # missing: sipr, dynamics, frazil, lateral melt
+            'color': '#ff595e',
+            'experiment_id': 'ssp585',
+            'source_id': 'CanESM5',
+            'variant_label': 'r1i1p2f1',
+        }, {
+            # missing: No explicit lateral melt
+            'color': '#ffca3a',
             'experiment_id': 'ssp585',
             'source_id': 'EC-Earth3',
             'variant_label': 'r4i1p1f1',
@@ -89,6 +88,42 @@ def ensemble():
             'prra_siconc': { 'grid_label': 'gr' },
             'tas': { 'grid_label': 'gr' },
             'tas_siconc': { 'grid_label': 'gr' }
+        }, {
+            'color': '#babb74',
+            'experiment_id': 'ssp585',
+            'source_id': 'HadGEM3-GC31-MM',
+            'variant_label': 'r1i1p1f3',
+        }, {
+            'color': '#8ab17d',
+            'experiment_id': 'ssp585',
+            'source_id': 'IPSL-CM6A-LR',
+            'variant_label': 'r1i1p1f1',
+        }, {
+            'color': '#2a9d8f',
+            'experiment_id': 'ssp585',
+            'source_id': 'MIROC6',
+            'variant_label': 'r1i1p1f1',
+        }, {
+            'color': '#3185fc',
+            'experiment_id': 'ssp585',
+            'source_id': 'MPI-ESM1-2-LR',
+            'variant_label': 'r1i1p1f1',
+        }, {
+            'color': '#287271',
+            'experiment_id': 'ssp585',
+            'source_id': 'MRI-ESM2-0',
+            'variant_label': 'r1i1p1f1',
+        }, {
+            'color': '#6a4c93',
+            'experiment_id': 'ssp585',
+            'source_id': 'NorESM2-LM',
+            'variant_label': 'r1i1p1f1',
+        }, {
+            'areacello_variant_label': 'r1i1p1f2',
+            'color': '#997b66',
+            'experiment_id': 'ssp585',
+            'source_id': 'UKESM1-0-LL',
+            'variant_label': 'r2i1p1f2'
         }
     ]
 
