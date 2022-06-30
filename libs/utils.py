@@ -120,6 +120,7 @@ def download_variable(
         default: False
     '''
     base_url = 'https://esgf-index1.ceda.ac.uk/esg-search/search/'
+    #base_url = 'https://esgf-node.llnl.gov/esg-search/search/'
     query = {
         'experiment_id': experiment_id,
         'format': 'application/solr+json',
@@ -286,6 +287,8 @@ def download_remote_files(item, local_path, headers, time_slice=None):
     item_id = item['id']
     item_index_node = item['index_node']
     url = f'https://esgf-index1.ceda.ac.uk/search_files/{item_id}/{item_index_node}/?limit=1000'
+    #url = f'https://esgf-node.llnl.gov/search_files/{item_id}/{item_index_node}/?limit=1000'
+    print(url)
     req = urllib.request.Request(url, headers=headers)
     response = urllib.request.urlopen(req)
     if response.status < 200 or response.status > 299:
