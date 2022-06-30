@@ -191,7 +191,12 @@ def download_variable(
             local_filenames = download_remote_files(item, item_local_path, headers, time_slice)
         except Exception as e:
             print('An error occurred downloading remote files', e, sep='\n')
-            return
+            print('Attempting to retrieve from local...')
+            local_filenames = get_local_files(item, item_local_path, time_slice)
+
+            if len(local_filenames) == 0:
+                print('None found, skipping.')
+                return
 
         if not process_files or len(local_filenames) == 0:
             continue
@@ -333,6 +338,34 @@ def download_remote_files(item, local_path, headers, time_slice=None):
             file_url,
             local_filename
         )
+
+    return local_filenames
+
+
+def get_local_files(item, local_path, headers, time_slice=None):
+    filename = '_'.join([
+        item['variable_id'][0],
+        item['table_id'][0],
+        item['source_id'][0],
+        item['experiment_id'][0],
+        item['variant_label'][0],
+        item['grid_label'][0],
+        '*'
+    ]) + '.nc'
+
+    matches = [m for m in Path(local_path).glob(filename) if '_processed.nc' not in str(m)]
+    local_filenames = []
+
+    for m in matches:
+        if time_slice != None:
+            date_out_of_bounds = test_date_bounds(
+                time_slice,
+                *daterange_from_filename(filename)
+            )
+            if date_out_of_bounds:
+                continue
+
+        local_filenames.append(str(m))
 
     return local_filenames
 
