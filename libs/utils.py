@@ -9,7 +9,6 @@ import urllib
 import xarray
 import xesmf
 
-
 def compress_nc_file(path, output, options=['-7 -L 1']):
     '''
     Function compress_nc_file():

@@ -6,7 +6,6 @@ import numpy as np
 import xarray
 xarray.set_options(keep_attrs=True);
 
-
 def calc_variable_mean(data, to_array='variable'):
     # Just in case 'Ensemble mean' already exists, delete + re-calculate
     if 'Ensemble mean' in data:

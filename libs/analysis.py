@@ -4,7 +4,6 @@ import libs.vars
 import xarray
 xarray.set_options(keep_attrs=True);
 
-
 def calendar_division_mean(data, time, division='month'):
     '''
     Function: calendar_division_mean()

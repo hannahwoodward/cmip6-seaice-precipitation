@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import cartopy.crs as ccrs
 import cftime
 import datetime
@@ -9,7 +8,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray
-
 
 def calendar_division_spatial(
     time_slices,
