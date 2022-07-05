@@ -98,6 +98,7 @@ def time_series_weighted(
     weight,
     weighting_method,
     weighting_process,
+    fillna=0,
     item_plot_kwargs={}
 ):
     ensemble_weighted_reduced = []
@@ -111,7 +112,10 @@ def time_series_weighted(
         item_data_reduced = getattr(item_data_weighted, weighting_method)(
             dim=item_data_weighted.weights.dims,
             skipna=True
-        ).fillna(0)
+        )
+
+        if fillna != None:
+            item_data_reduced = item_data_reduced.fillna(fillna)
 
         item_base_kwargs = {
             'color': item['color'],
@@ -123,7 +127,7 @@ def time_series_weighted(
             { **item_base_kwargs, **{ 'data': item_data_reduced } }
         )
         ensemble_weighted_reduced_smooth.append(
-            { **item_base_kwargs, **{ 'data': libs.analysis.smoothed_mean(item_data_reduced) } }
+            { **item_base_kwargs, **{ 'data': libs.analysis.smoothed_mean(item_data_reduced.fillna(0)) } }
         )
 
     ensemble_weighted_reduced_smooth.append(
