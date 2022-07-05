@@ -95,10 +95,12 @@ def calendar_division_spatial(
 
 def monthly_variability(
     data,
-    title,
     ylabel,
     cols=None,
+    ax=None,
+    fig=None,
     legend_below=False,
+    title=None,
     variables=None,
     yrange=None
 ):
@@ -125,8 +127,10 @@ def monthly_variability(
     variables = variables if variables != None else list(data[0])
     arr = [item[v] for item in data for v in variables if v in item]
 
-    fig, ax = plt.subplots(figsize=(15, 7))
-    fig.suptitle(title)
+    if fig == None:
+        fig, ax = plt.subplots(figsize=(15, 7))
+        fig.suptitle(title)
+
     yrange != None and ax.set_ylim(*yrange)
     monthly_variability_subplot(arr, ax, '', ylabel)
     place_legend(fig, ax, len(variables), cols=cols, force_below=legend_below)
@@ -356,6 +360,7 @@ def time_series(
     title,
     xattr,
     ylabel,
+    cols=None,
     process=lambda x: x,
     years=np.arange(1980, 2101, 20),
     yrange=None
@@ -406,15 +411,18 @@ def time_series(
         year_ticks = [cftime.Datetime360Day(y, 1, 1, 0, 0, 0) for y in years]
     ax.set_xticks(year_ticks) #, years)
     ax.set_xticklabels(years)
-    place_legend(fig, ax, len(data))
+    place_legend(fig, ax, len(data), cols=cols)
 
 
 def time_series_from_vars(
     data,
-    title,
     xattr,
     ylabel,
+    ax=None,
+    fig=None,
+    figsize=(15, 7),
     process=lambda x: x,
+    title='',
     variables=None,
     years=np.arange(1980, 2101, 20),
     yrange=None
@@ -444,8 +452,10 @@ def time_series_from_vars(
         data = [data]
 
     variables = variables if variables != None else list(data[0])
-    fig, ax = plt.subplots(figsize=(15, 7))
-    fig.suptitle(title)
+    if fig == None:
+        fig, ax = plt.subplots(figsize=figsize)
+        title and fig.suptitle(title)
+
     xmin = None
     xmax = None
     for i, key in enumerate(variables):
@@ -472,3 +482,5 @@ def time_series_from_vars(
     ax.set_xticks(year_ticks) #, years)
     ax.set_xticklabels(years)
     place_legend(fig, ax, len(variables))
+
+    return fig
