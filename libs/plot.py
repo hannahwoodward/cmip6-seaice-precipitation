@@ -458,6 +458,9 @@ def time_series_from_vars(
     xmax = None
     for i, key in enumerate(variables):
         for item in data:
+            if key not in item:
+                continue
+
             label = key
             color = item[key].attrs['color'] if 'color' in item[key].attrs else None
             plot_kwargs = item[key].attrs['plot_kwargs'] if 'plot_kwargs' in item[key].attrs else {}
