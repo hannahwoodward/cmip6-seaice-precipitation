@@ -98,6 +98,15 @@ def ensemble():
             'experiment_id': 'ssp585',
             'source_id': 'IPSL-CM6A-LR',
             'variant_label': 'r1i1p1f1',
+            'evspsbl': { 'grid_label': 'gr' },
+            'pr': { 'grid_label': 'gr' },
+            'pr_siconc': { 'grid_label': 'gr' },
+            'prsn': { 'grid_label': 'gr' },
+            'prsn_siconc': { 'grid_label': 'gr' },
+            'prra': { 'grid_label': 'gr' },
+            'prra_siconc': { 'grid_label': 'gr' },
+            'tas': { 'grid_label': 'gr' },
+            'tas_siconc': { 'grid_label': 'gr' }
         }, {
             'color': '#2a9d8f',
             'experiment_id': 'ssp585',
