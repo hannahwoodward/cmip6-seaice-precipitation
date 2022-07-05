@@ -129,8 +129,4 @@ def time_series_weighted(
             { **item_base_kwargs, **{ 'data': libs.analysis.smoothed_mean(item_data_reduced.fillna(0)) } }
         )
 
-    ensemble_weighted_reduced_smooth.append(
-        libs.analysis.ensemble_mean(ensemble_weighted_reduced_smooth)
-    )
-
     return ensemble_weighted_reduced, ensemble_weighted_reduced_smooth
