@@ -78,6 +78,7 @@ def ensemble():
             'source_id': 'EC-Earth3',
             'variant_label': 'r4i1p1f1',
             'evspsbl': { 'grid_label': 'gr' },
+            'evspsbl_siconc': { 'grid_label': 'gr' },
             'pr': { 'grid_label': 'gr' },
             'pr_siconc': { 'grid_label': 'gr' },
             'prsn': { 'grid_label': 'gr' },
@@ -97,6 +98,7 @@ def ensemble():
             'source_id': 'IPSL-CM6A-LR',
             'variant_label': 'r1i1p1f1',
             'evspsbl': { 'grid_label': 'gr' },
+            'evspsbl_siconc': { 'grid_label': 'gr' },
             'pr': { 'grid_label': 'gr' },
             'pr_siconc': { 'grid_label': 'gr' },
             'prsn': { 'grid_label': 'gr' },
@@ -325,6 +327,15 @@ def variables():
             'text': 'evaporation and sublimation over sea-ice and ocean',
             'units': 'mm day⁻¹',
             'variable_id': 'evspsbl',
+            'weighting_method': 'mean',
+            'weighting_process': lambda x: x
+        },
+         {
+            'component': 'Amon',
+            'preprocess': preprocess_evspsbl,
+            'text': 'evaporation and sublimation over sea-ice',
+            'units': 'mm day⁻¹',
+            'variable_id': 'evspsbl_siconc',
             'weighting_method': 'mean',
             'weighting_process': lambda x: x
         },
