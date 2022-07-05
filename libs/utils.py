@@ -268,7 +268,7 @@ def download_variable(
 
         # Finally, compress as to_netcdf() seems to produce large file sizes
         combined_path, diff = compress_nc_file(combined_path, combined_path)
-        print(f'   -> Compressed ({diff})')
+        print(f'   -> Compressed (Savings: {diff})')
 
         # Delete temporary _merged.nc
         Path(merged_file_path).unlink()
