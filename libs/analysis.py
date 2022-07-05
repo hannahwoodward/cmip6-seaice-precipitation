@@ -128,6 +128,7 @@ def ensemble_mean(ensemble):
     - (dict): the calculated mean in format
         { 'color': '#000', 'data': (xarray), 'label': 'Ensemble mean' }
     '''
+    print('--- DEPRECATED: use libs.ensemble.calc_variable_mean() ---')
     data = ensemble[0]['data'].copy()
     for item in ensemble[1:]:
         data += item['data']
