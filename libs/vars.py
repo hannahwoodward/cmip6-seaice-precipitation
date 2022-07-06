@@ -80,6 +80,7 @@ def ensemble():
             'evspsbl': { 'grid_label': 'gr' },
             'evspsbl_siconc': { 'grid_label': 'gr' },
             'pr': { 'grid_label': 'gr' },
+            'prnet': { 'grid_label': 'gr' },
             'pr_siconc': { 'grid_label': 'gr' },
             'prsn': { 'grid_label': 'gr' },
             'prsn_siconc': { 'grid_label': 'gr' },
@@ -100,6 +101,7 @@ def ensemble():
             'evspsbl': { 'grid_label': 'gr' },
             'evspsbl_siconc': { 'grid_label': 'gr' },
             'pr': { 'grid_label': 'gr' },
+            'prnet': { 'grid_label': 'gr' },
             'pr_siconc': { 'grid_label': 'gr' },
             'prsn': { 'grid_label': 'gr' },
             'prsn_siconc': { 'grid_label': 'gr' },
@@ -255,6 +257,15 @@ def variables():
             'text': 'precipitation over sea-ice and ocean',
             'units': 'mm day⁻¹',
             'variable_id': 'pr',
+            'weighting_method': 'mean',
+            'weighting_process': lambda x: x
+        },
+        {
+            'component': 'Amon',
+            'preprocess': preprocess_pr,
+            'text': 'net precipitation over sea-ice and ocean',
+            'units': 'mm day⁻¹',
+            'variable_id': 'prnet',
             'weighting_method': 'mean',
             'weighting_process': lambda x: x
         },
