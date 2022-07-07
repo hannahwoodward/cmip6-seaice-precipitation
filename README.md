@@ -36,6 +36,7 @@ Codebase for dissertation project which aims to investigate the effect of rainfa
 The following notebooks must be processed in this order before running any other notebooks:
 - Run `preprocessing/remote-download.ipynb` to download and pre-process all variables
 - Run `preprocessing/create-prra.ipynb` to create `prra` variable
+- Run `preprocessing/create-prnet.ipynb` to create `prra` variable
 - Run `preprocessing/create-vars-siconc.ipynb` to create variables masked to `siconc > 0`
 - Run `preprocessing/create-vars-siconc-weighted.ipynb` to create variables multiplied by `siconc`
 - Run `preprocessing/create-time-series-regional.ipynb` to create time series for each [NSIDC region](https://github.com/hannahwoodward/cmip6-seaice-precipitation/blob/5b977709929f503c07c84979dbf1dbfd1b8186f7/libs/vars.py#L96)
