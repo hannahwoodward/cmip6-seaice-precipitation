@@ -96,3 +96,130 @@ def write_netcdf_with_encoding(data, path):
     )
     with ProgressBar():
         write.compute()
+
+
+def monthly_variability_regional(
+    ensemble,
+    title,
+    ylabel,
+    mask_type='latlon',
+    calc_ensemble_mean=False,
+    process=lambda x: x,
+    yrange=None
+):
+    '''
+    Function: monthly_variability_regional()
+        Mask ensemble data to nsidc regions and plot monthly variability
+
+    Inputs:
+    - arr (xarray): array of data in format
+        [{ 'label': (string), 'data': (xarray) }, ...]
+    - title (string): axis title
+    - ylabel (string): y-axis label
+    - mask_type (string): whether to load mask on ocean or latlon grid
+        allowed values: 'latlon', 'ocean'
+        default: 'latlon'
+    - calc_ensemble_mean (bool): whether to calculate ensemble mean
+        default: False
+    - process (function): process data before plotting, input is
+        arr item['data'] which has been already masked to region
+        default: lambda x: x
+    - yrange (array): y-axis range e.g. [0, 5]
+        default: None
+
+    Outputs: None
+
+    TODO:
+    - color
+    - automate ylim
+    - legend below subplots?
+    '''
+    # Get all individual regions
+    regions = [r for r in libs.vars.nsidc_regions() if len(r['values']) == 1]
+    path_nsidc_mask = '_data/_cache/NSIDC_Regions_Masks_LatLon_nearest_s2d.nc'
+    if mask_type == 'ocean':
+        path_nsidc_mask = '_data/_cache/NSIDC_Regions_Masks_Ocean_nearest_s2d.nc'
+
+    nsidc_mask = xarray.open_mfdataset(paths=path_nsidc_mask, combine='by_coords').mask
+
+    if mask_type == 'latlon':
+        nsidc_mask = nsidc_mask.roll(x=96, roll_coords=True)
+
+    fig, axs = plt.subplots(3, 3, figsize=(15, 15))
+    axs = axs.flatten()
+    fig.suptitle(title)
+
+    for i, region in enumerate(regions):
+        ensemble_masked = [{
+            'color': item['color'],
+            'data': process(
+                item['data'].where(np.isin(nsidc_mask.values, region['values']))
+            ),
+            'label': item['label']
+        } for item in ensemble]
+
+        if calc_ensemble_mean:
+            ensemble_masked.append(libs.analysis.ensemble_mean(ensemble_masked))
+
+        ax = axs[i]
+        monthly_variability_subplot(ensemble_masked, ax, region['label'], ylabel)
+
+    yrange != None and plt.setp(axs, ylim=yrange)
+    place_legend(fig, axs[0], len(ensemble))
+    fig.show()
+
+
+def monthly_variability_regional(
+        ensemble_time_slices,
+        plot_kwargs,
+        weight,
+        weighting_method,
+        weighting_process
+    ):
+        for s in ensemble_time_slices:
+            s_label = s['label']
+            kwargs = dict(plot_kwargs)
+            kwargs['title'] = kwargs['title'].format(s_label=s_label)
+
+            libs.plot.monthly_variability_regional(
+                s['ensemble'],
+                calc_ensemble_mean=True,
+                mask_type='ocean',
+                process=lambda x: libs.analysis.monthly_weighted(
+                    weighting_process(x),
+                    weight,
+                    method=weighting_method
+                ),
+                **kwargs
+            )
+
+            print(' ')
+
+
+    def monthly_variability_full(
+        ensemble_time_slices,
+        plot_kwargs,
+        weight,
+        weighting_method,
+        weighting_process,
+        calc_ensemble_mean=True,
+    ):
+        for s in ensemble_time_slices:
+            ensemble_processed = [{
+                'color': item['color'],
+                'data': libs.analysis.monthly_weighted(
+                    weighting_process(item['data']),
+                    weight,
+                    method=weighting_method
+                ),
+                'label': item['label'],
+                'plot_kwargs': item['plot_kwargs'] if 'plot_kwargs' in item else {}
+            } for item in s['ensemble']]
+
+            # Calculate and add ensemble mean
+            calc_ensemble_mean and ensemble_processed.append(libs.analysis.ensemble_mean(ensemble_processed))
+
+            s_label = s['label']
+            kwargs = dict(plot_kwargs)
+            kwargs['title'] = kwargs['title'].format(s_label=s_label)
+            libs.plot.monthly_variability(ensemble_processed, **kwargs)
