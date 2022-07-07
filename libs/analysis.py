@@ -4,7 +4,6 @@ import libs.vars
 import xarray
 xarray.set_options(keep_attrs=True);
 
-
 def calendar_division_mean(data, time, division='month'):
     '''
     Function: calendar_division_mean()
@@ -43,7 +42,7 @@ def climatology_monthly(data, date_start, date_end, relative=False):
     climatology = baseline.groupby(period).mean('time')
 
     if relative:
-        return 100 * ((data.groupby(period) / climatology) - 1)
+        return (100 * ((data.groupby(period) / climatology) - 1))
 
     return (data.groupby(period) - climatology)
 
@@ -122,12 +121,13 @@ def ensemble_mean(ensemble):
 
     Inputs:
     - ensemble (array): array with items formatted as
-        { 'data': (xarray), 'label: (string) }
+        { 'data': (xarray), 'label': (string) }
 
     Outputs:
     - (dict): the calculated mean in format
         { 'color': '#000', 'data': (xarray), 'label': 'Ensemble mean' }
     '''
+    print('--- DEPRECATED: use libs.ensemble.calc_variable_mean() ---')
     data = ensemble[0]['data'].copy()
     for item in ensemble[1:]:
         data += item['data']

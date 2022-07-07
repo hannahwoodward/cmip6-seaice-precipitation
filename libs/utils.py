@@ -9,7 +9,6 @@ import urllib
 import xarray
 import xesmf
 
-
 def compress_nc_file(path, output, options=['-7 -L 1']):
     '''
     Function compress_nc_file():
@@ -27,9 +26,14 @@ def compress_nc_file(path, output, options=['-7 -L 1']):
     Output:
         - (string): compressed file path (same as output)
     '''
+    size_old = Path(path).stat().st_size
     nco = Nco()
     nco.ncks(input=str(path), output=str(output), options=options)
-    return output
+    size_new = Path(output).stat().st_size
+    diff = (1 - size_new / size_old) * 100
+    diff_str = f'{diff:.2f}%'
+
+    return output, diff_str
 
 
 def convert_to_360_day(i):
@@ -39,8 +43,7 @@ def convert_to_360_day(i):
         o_time.values[i] = cftime.Datetime360Day(
             time.year,
             time.month,
-            16,
-            has_year_zero=time.has_year_zero
+            16 #, has_year_zero=time.has_year_zero
         )
 
     o = o.assign_coords({ 'time': o_time })
@@ -121,6 +124,7 @@ def download_variable(
         default: False
     '''
     base_url = 'https://esgf-index1.ceda.ac.uk/esg-search/search/'
+    #base_url = 'https://esgf-node.llnl.gov/esg-search/search/'
     query = {
         'experiment_id': experiment_id,
         'format': 'application/solr+json',
@@ -191,7 +195,12 @@ def download_variable(
             local_filenames = download_remote_files(item, item_local_path, headers, time_slice)
         except Exception as e:
             print('An error occurred downloading remote files', e, sep='\n')
-            return
+            print('Attempting to retrieve from local...')
+            local_filenames = get_local_files(item, item_local_path, time_slice)
+
+            if len(local_filenames) == 0:
+                print('None found, skipping.')
+                return
 
         if not process_files or len(local_filenames) == 0:
             continue
@@ -257,8 +266,8 @@ def download_variable(
         print('   -> Saved to disk')
 
         # Finally, compress as to_netcdf() seems to produce large file sizes
-        combined_path = compress_nc_file(combined_path, combined_path)
-        print('   -> Compressed')
+        combined_path, diff = compress_nc_file(combined_path, combined_path)
+        print(f'   -> Compressed (Savings: {diff})')
 
         # Delete temporary _merged.nc
         Path(merged_file_path).unlink()
@@ -287,6 +296,8 @@ def download_remote_files(item, local_path, headers, time_slice=None):
     item_id = item['id']
     item_index_node = item['index_node']
     url = f'https://esgf-index1.ceda.ac.uk/search_files/{item_id}/{item_index_node}/?limit=1000'
+    #url = f'https://esgf-node.llnl.gov/search_files/{item_id}/{item_index_node}/?limit=1000'
+    print(url)
     req = urllib.request.Request(url, headers=headers)
     response = urllib.request.urlopen(req)
     if response.status < 200 or response.status > 299:
@@ -331,6 +342,34 @@ def download_remote_files(item, local_path, headers, time_slice=None):
             file_url,
             local_filename
         )
+
+    return local_filenames
+
+
+def get_local_files(item, local_path, headers, time_slice=None):
+    filename = '_'.join([
+        item['variable_id'][0],
+        item['table_id'][0],
+        item['source_id'][0],
+        item['experiment_id'][0],
+        item['variant_label'][0],
+        item['grid_label'][0],
+        '*'
+    ]) + '.nc'
+
+    matches = [m for m in Path(local_path).glob(filename) if '_processed.nc' not in str(m)]
+    local_filenames = []
+
+    for m in matches:
+        if time_slice != None:
+            date_out_of_bounds = test_date_bounds(
+                time_slice,
+                *daterange_from_filename(filename)
+            )
+            if date_out_of_bounds:
+                continue
+
+        local_filenames.append(str(m))
 
     return local_filenames
 

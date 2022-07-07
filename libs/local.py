@@ -2,7 +2,6 @@ from pathlib import Path
 import libs.vars
 import xarray
 
-
 def get_data(
     component,
     experiment_id,
