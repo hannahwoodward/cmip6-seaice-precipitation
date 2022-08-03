@@ -23,6 +23,8 @@ Codebase for dissertation project which aims to investigate the effect of rainfa
 !git clone https://github.com/hannahwoodward/cmip6-seaice-precipitation.git
 ```
 
+- [Follow instructions to create an account and generate API key for cdsapi](https://cds.climate.copernicus.eu/api-how-to#install-the-cds-api-key). This is used for downloading ERA5 reanalysis.
+
 
 ### Local
 
