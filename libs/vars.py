@@ -74,18 +74,21 @@ def ensemble():
             # No explicit lateral melt or frazil ice formation
             'color': '#f28c87',
             'experiment_id': 'ssp585',
+            'si_collapse': False,
             'source_id': 'ACCESS-CM2',
             'variant_label': 'r1i1p1f1',
         }, {
             # missing: sipr, dynamics, frazil, lateral melt
             'color': '#ff595e',
             'experiment_id': 'ssp585',
+            'si_collapse': True,
             'source_id': 'CanESM5',
             'variant_label': 'r1i1p2f1',
         }, {
             # missing: No explicit lateral melt
             'color': '#ffca3a',
             'experiment_id': 'ssp585',
+            'si_collapse': False,
             'source_id': 'EC-Earth3',
             'variant_label': 'r4i1p1f1',
             'evspsbl': { 'grid_label': 'gr' },
@@ -102,11 +105,13 @@ def ensemble():
         }, {
             'color': '#babb74',
             'experiment_id': 'ssp585',
+            'si_collapse': True,
             'source_id': 'HadGEM3-GC31-MM',
             'variant_label': 'r1i1p1f3',
         }, {
             'color': '#8ab17d',
             'experiment_id': 'ssp585',
+            'si_collapse': True,
             'source_id': 'IPSL-CM6A-LR',
             'variant_label': 'r1i1p1f1',
             'evspsbl': { 'grid_label': 'gr' },
@@ -123,27 +128,32 @@ def ensemble():
         }, {
             'color': '#2a9d8f',
             'experiment_id': 'ssp585',
+            'si_collapse': False,
             'source_id': 'MIROC6',
             'variant_label': 'r1i1p1f1',
         }, {
             'color': '#3185fc',
             'experiment_id': 'ssp585',
+            'si_collapse': False,
             'source_id': 'MPI-ESM1-2-LR',
             'variant_label': 'r1i1p1f1',
         }, {
             'color': '#287271',
             'experiment_id': 'ssp585',
+            'si_collapse': False,
             'source_id': 'MRI-ESM2-0',
             'variant_label': 'r1i1p1f1',
         }, {
             'color': '#6a4c93',
             'experiment_id': 'ssp585',
+            'si_collapse': False,
             'source_id': 'NorESM2-LM',
             'variant_label': 'r1i1p1f1',
         }, {
             'areacello_variant_label': 'r1i1p1f2',
             'color': '#997b66',
             'experiment_id': 'ssp585',
+            'si_collapse': True,
             'source_id': 'UKESM1-0-LL',
             'variant_label': 'r2i1p1f2'
         }
