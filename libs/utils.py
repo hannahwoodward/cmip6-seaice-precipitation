@@ -404,7 +404,7 @@ def regrid(
     save_file=None
 ):
     # Check if the data already has the target grid
-    if hasattr(data, 'attrs') and hasattr(grid, 'attrs'):
+    if hasattr(data, 'attrs') and 'grid' in data.attrs and hasattr(grid, 'attrs'):
         if data.attrs['grid'] == grid.attrs['grid']:
             return data
 
