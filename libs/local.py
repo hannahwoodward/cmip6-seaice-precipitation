@@ -1,5 +1,6 @@
 from pathlib import Path
 import libs.vars
+import numpy as np
 import xarray
 
 def get_data(
@@ -54,6 +55,40 @@ def get_data(
             return None
 
     return xarray.open_mfdataset(paths=filepaths, combine='by_coords', use_cftime=True)
+
+
+def get_obs(filename, source_id, variable_id, color='#8e8e8e', mask=True):
+    filepath = f'_data/_cache/_obs/{filename}'
+
+    if not Path(filepath).exists():
+        print('Error 404', f'-> {filepath}', sep='\n')
+        return None
+
+    obs_data = xarray.open_mfdataset(
+        paths=filepath,
+        combine='by_coords',
+        use_cftime=True
+    )[variable_id]
+
+    obs_data.attrs['label'] = source_id
+    obs_data.attrs['color'] = color
+    obs_data.attrs['plot_kwargs'] = { 'linestyle': (0, (5, 1)), 'linewidth': 2 }
+
+    if not mask:
+        return obs_data
+
+    # Mask data to nsidc regions
+    path_nsidc_mask = '_data/_cache/NSIDC_Regions_Masks_Ocean_nearest_s2d.nc'
+    nsidc_mask = xarray.open_mfdataset(paths=path_nsidc_mask, combine='by_coords').mask
+    nsidc_all = [
+        r for r in libs.vars.nsidc_regions() if r['label'] == 'All'
+    ][0]
+
+    obs_data = obs_data\
+        .where(obs_data.latitude > 60)\
+        .where(np.isin(nsidc_mask.values, nsidc_all['values']))
+
+    return obs_data
 
 
 def get_ensemble_regional_series(variable_id, experiment, suffix=''):
