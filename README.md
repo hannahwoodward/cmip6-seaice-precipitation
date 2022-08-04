@@ -37,6 +37,7 @@ Codebase for dissertation project which aims to investigate the effect of rainfa
 
 The following notebooks must be processed in this order before running any other notebooks:
 - Run `preprocessing/remote-download.ipynb` to download and pre-process all variables
+- Run `preprocessing/remote-download-obs.ipynb` to download and pre-process all observational/reanalysis data
 - Run `preprocessing/create-prra.ipynb` to create `prra` variable
 - Run `preprocessing/create-prnet.ipynb` to create `prra` variable
 - Run `preprocessing/create-vars-siconc.ipynb` to create variables masked to `siconc > 0`
