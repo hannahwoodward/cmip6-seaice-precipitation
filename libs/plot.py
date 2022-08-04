@@ -91,6 +91,29 @@ def calendar_division_spatial(
         )
 
 
+def legend_standalone(fig, legend_confs=[]):
+    for i, a in enumerate(fig.axes):
+        fig_legend, ax_legend = plt.subplots(1, 1, figsize=(1, 1))
+        ax_legend.set_visible(False)
+
+        exclude_list = legend_confs[i]['exclude']
+        ncol = legend_confs[i]['ncol']
+        handles = []
+        labels = []
+        a_handles, a_labels = a.get_legend_handles_labels()
+        for i, label in enumerate(a_labels):
+            if (label not in labels) and (label not in exclude_list):
+                handles.append(a_handles[i])
+                labels.append(label)
+
+        fig_legend.legend(
+            handles=handles,
+            labels=labels,
+            fontsize=15,
+            ncol=ncol
+        )
+
+
 def monthly_variability(
     data,
     ylabel,
@@ -98,6 +121,7 @@ def monthly_variability(
     ax=None,
     fig=None,
     legend_below=False,
+    show_legend=True,
     title=None,
     variables=None,
     yrange=None
@@ -131,7 +155,7 @@ def monthly_variability(
 
     yrange != None and ax.set_ylim(*yrange)
     monthly_variability_subplot(arr, ax, '', ylabel)
-    place_legend(fig, ax, len(variables), cols=cols, force_below=legend_below)
+    show_legend and place_legend(fig, ax, len(variables), cols=cols, force_below=legend_below)
     fig.show()
 
     return fig
@@ -420,6 +444,7 @@ def time_series_from_vars(
     fig=None,
     figsize=(15, 7),
     process=lambda x: x,
+    show_legend=True,
     title='',
     variables=None,
     years=np.arange(1980, 2101, 20),
@@ -482,6 +507,6 @@ def time_series_from_vars(
         year_ticks = [cftime.Datetime360Day(y, 1, 1, 0, 0, 0) for y in years]
     ax.set_xticks(year_ticks) #, years)
     ax.set_xticklabels(years)
-    place_legend(fig, ax, len(variables))
+    show_legend and place_legend(fig, ax, len(variables))
 
     return fig
