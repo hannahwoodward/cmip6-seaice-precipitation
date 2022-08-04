@@ -206,7 +206,7 @@ def monthly_variability_regional(
         ax = axs[i]
         regional_data = regional_data if type(regional_data) == list else [regional_data]
         regional_label = regional_data[0].attrs['region']
-        regional_arr = [item[v] for item in regional_data for v in variables]
+        regional_arr = [item[v] for item in regional_data for v in variables if v in item]
         monthly_variability_subplot(regional_arr, ax, regional_label, ylabel)
 
     yrange != None and plt.setp(axs, ylim=yrange)
@@ -331,6 +331,8 @@ def nstereo(
         )
 
     fig.show()
+
+    return fig, subfigs
 
 
 def place_legend(fig, ax, data_size, cols=None, force_below=False):
