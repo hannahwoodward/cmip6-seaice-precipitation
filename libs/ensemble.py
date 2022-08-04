@@ -6,16 +6,19 @@ import numpy as np
 import xarray
 xarray.set_options(keep_attrs=True);
 
-def calc_variable_mean(data, to_array='variable'):
+def calc_variable_mean(data, subset=None, to_array='variable', var_name='Ensemble mean'):
     # Just in case 'Ensemble mean' already exists, delete + re-calculate
-    if 'Ensemble mean' in data:
-        del data['Ensemble mean']
+    if var_name in data:
+        del data[var_name]
 
-    ensemble_mean = data.to_array(to_array).mean(to_array, skipna=True)
+    ds = data
+    if subset != None:
+        ds = ds[subset]
+
+    ensemble_mean = ds.to_array(to_array).mean(to_array, skipna=True)
     ensemble_mean.attrs['color'] = '#000'
     ensemble_mean.attrs['label'] = 'Ensemble mean'
-    #ensemble_mean.attrs['plot_kwargs'] = { 'linewidth': 2 }
-    data['Ensemble mean'] = ensemble_mean
+    data[var_name] = ensemble_mean
 
     return data
 
