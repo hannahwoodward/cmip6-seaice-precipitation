@@ -20,6 +20,17 @@ def default_time_slices():
         { 'slice': { 'time': slice('2080-01-01', '2101-01-01') }, 'label': '2080-2100' }
     ]
 
+def time_slices_20y():
+    # https://coolors.co/palette/f94144-f3722c-f8961e-f9c74f-90be6d-43aa8b-4d908e-277da1
+    return [
+        { 'slice': { 'time': slice('1980-01-01', '2001-01-01') }, 'label': '1980-2000', 'color': '#43aa8b' },
+        { 'slice': { 'time': slice('2000-01-01', '2021-01-01') }, 'label': '2000-2020', 'color': '#90be6d' },
+        { 'slice': { 'time': slice('2020-01-01', '2041-01-01') }, 'label': '2020-2040', 'color': '#f9c74f' },
+        { 'slice': { 'time': slice('2040-01-01', '2061-01-01') }, 'label': '2040-2060', 'color': '#f8961e' },
+        { 'slice': { 'time': slice('2060-01-01', '2081-01-01') }, 'label': '2060-2080', 'color': '#f3722c' },
+        { 'slice': { 'time': slice('2080-01-01', '2101-01-01') }, 'label': '2080-2100', 'color': '#f94144' },
+    ]
+
 
 def ensemble():
     # unstructured mesh, only daily data
