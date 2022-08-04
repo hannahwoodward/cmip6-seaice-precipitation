@@ -208,6 +208,21 @@ def variables():
     return [
         {
             'component': 'SImon',
+            'obs': [
+                {
+                    'color': '#002ea5',
+                    'filename': 'HadISST_ice_processed.nc',
+                    'source_id': 'HadISST1',
+                    'variable_id': 'sic'
+                },
+                {
+                    'filename': 'HadISST.2.2.0.0_sea_ice_concentration_processed.nc',
+                    'color': '#7600a5',
+                    'source_id': 'HadISST.2.2.0.0',
+                    'variable_id': 'sic'
+                }
+
+            ],
             'text': 'sea-ice area',
             'units': 'km²',
             'variable_id': 'siconc',
@@ -274,6 +289,14 @@ def variables():
         },
         {
             'component': 'Amon',
+            'obs': [
+                {
+                    'filename': 'era5_total_precipitation_1980-2020_processed.nc',
+                    'color': '#002ea5',
+                    'source_id': 'ERA5',
+                    'variable_id': 'tp'
+                }
+            ],
             'preprocess': preprocess_pr,
             'text': 'precipitation over sea-ice and ocean',
             'units': 'mm day⁻¹',
@@ -292,6 +315,14 @@ def variables():
         },
         {
             'component': 'Amon',
+            'obs': [
+                {
+                    'filename': 'era5_snowfall_1980-2020_processed.nc',
+                    'color': '#002ea5',
+                    'source_id': 'ERA5',
+                    'variable_id': 'sf'
+                }
+            ],
             'preprocess': preprocess_pr,
             'text': 'snowfall over sea-ice and ocean',
             'units': 'mm day⁻¹',
@@ -337,6 +368,14 @@ def variables():
         },
         {
             'component': 'Amon',
+            'obs': [
+                {
+                    'filename': 'era5_2m_temperature_1980-2020_processed.nc',
+                    'color': '#002ea5',
+                    'source_id': 'ERA5',
+                    'variable_id': 't2m'
+                }
+            ],
             'preprocess': preprocess_temp,
             'text': 'surface air temperature over sea-ice and ocean',
             'units': '°C',
@@ -355,6 +394,14 @@ def variables():
         },
         {
             'component': 'Amon',
+            'obs': [
+                {
+                    'filename': 'era5_evaporation_1980-2020_processed.nc',
+                    'color': '#002ea5',
+                    'source_id': 'ERA5',
+                    'variable_id': 'e'
+                }
+            ],
             'preprocess': preprocess_evspsbl,
             'text': 'evaporation and sublimation over sea-ice and ocean',
             'units': 'mm day⁻¹',
@@ -373,6 +420,14 @@ def variables():
         },
         {
             'component': 'Omon',
+            'obs': [
+                {
+                    'filename': 'era5_sea_surface_temperature_1980-2020_processed.nc',
+                    'color': '#002ea5',
+                    'source_id': 'ERA5',
+                    'variable_id': 'sst'
+                }
+            ],
             'text': 'sea surface temperature',
             'units': '°C',
             'variable_id': 'tos',
