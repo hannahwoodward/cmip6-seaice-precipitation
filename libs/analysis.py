@@ -4,6 +4,49 @@ import libs.vars
 import xarray
 xarray.set_options(keep_attrs=True);
 
+def calc_diffs(ds, unit, relative=False, verbose=True):
+    delta_obj = {}
+    for v in ds:
+        clim_mean = float(ds[v].sel(year=slice('1980', '2010')).mean('year'))
+        end_mean = float(ds[v].sel(year=slice('2080', '2100')).mean('year'))
+        delta = end_mean - clim_mean
+        delta_unit = unit
+
+        if relative:
+            delta = (100 * end_mean / clim_mean) - 100
+            delta_unit = '%'
+
+        if v != 'Ensemble mean':
+            delta_obj[v] = delta
+
+        verbose and print(
+            v,
+            f'-> 1980-2010: {clim_mean:.2f}{unit}',
+            f'-> 2080-2100: {end_mean:.2f}{unit}',
+            f'-> delta: {delta:.2f}{delta_unit}',
+            sep='\n'
+        )
+
+    delta_list = list(delta_obj.values())
+    arr_min = min(delta_list)
+    arr_max = max(delta_list)
+    analysis = {
+        'delta': delta_obj,
+        'mean': sum(delta_list) / len(delta_list),
+        'median': arr_min + ((arr_max - arr_min) / 2),
+        'range': f'{arr_min} - {arr_max}'
+    }
+
+    if verbose:
+        print('')
+        print('Range', analysis['range'])
+        print('Median', analysis['median'])
+        print('Mean', analysis['mean'])
+        print('')
+
+    return analysis
+
+
 def calendar_division_mean(data, time, division='month'):
     '''
     Function: calendar_division_mean()
