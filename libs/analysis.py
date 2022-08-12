@@ -104,12 +104,15 @@ def correlation_spatial_clim(
     ensemble_a,
     ensemble_b,
     climatology_period=slice('1980-01-01', '2011-01-01'),
+    cmap='RdBu_r',
     correlation_period=None,
     division='season',
-    periods=['DJF', 'MAM', 'JJA', 'SON']
+    periods=['DJF', 'MAM', 'JJA', 'SON'],
+    shape=None
 ):
     var_a_name = ensemble_a[0]['data'].name
     var_b_name = ensemble_b[0]['data'].name
+    correlation_data = []
 
     for p in periods:
         ensemble_data = []
@@ -146,7 +149,7 @@ def correlation_spatial_clim(
             title=f'{p} {var_a_name}/{var_b_name} correlation (climatology 1980-2010)',
             colorbar_label='Correlation',
             colormesh_kwargs={
-                'cmap': 'RdBu_r',
+                'cmap': cmap,
                 'extend': 'neither',
                 'levels': 21,
                 'vmin': -1,
@@ -154,8 +157,11 @@ def correlation_spatial_clim(
                 'x': 'longitude',
                 'y': 'latitude'
             },
-            shape=(1, len(ensemble_data))
+            shape=shape
         )
+        correlation_data.append(ensemble_data)
+
+    return correlation_data
 
 
 def ensemble_mean(ensemble):
