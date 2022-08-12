@@ -16,6 +16,7 @@ def calendar_division_spatial(
     units,
     col_var='ensemble',
     division='month',
+    shape=None,
     text='',
     title=''
 ):
@@ -87,6 +88,7 @@ def calendar_division_spatial(
             cols,
             colorbar_label=f'{text} ({units})',
             colormesh_kwargs=colormesh_kwargs,
+            shape=shape,
             title=title.format(label=label, text=text, time=time, units=units)
         )
 
