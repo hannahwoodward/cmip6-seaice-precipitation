@@ -4,18 +4,21 @@ Codebase for dissertation project which aims to investigate the effect of rainfa
 
 ## Figures
 
-1. NSIDC regions (regions.ipynb TODO)
+1. NSIDC regions (regions.ipynb [2])
 2. Sea ice area min/max & seasonal trends (ensemble-siconc.ipynb [8])
 3. Sea ice concentration spatial (ensemble-siconc.ipynb [14, 15])
 4. Sea ice thickness min/max & spatial (ensemble-sithick.ipynb [8, 12, 13])
 5. Sea ice snow thickness min/max (ensemble-sisnthick.ipynb [7])
 6. Surface air and sea temperature, annual mean & seasonal trends (ensemble-trends-tas-tos.ipynb [4])
-7. Precipitation, evaporation, snowfall, and rainfall, annual mean & seasonal trends (ensemble-trends-pr-evspsbl.ipynb [4], ensemble-trends-prra-prsn.ipynb [4])
+7. Precipitation and evaporation, snowfall and rainfall, annual mean & seasonal trends (ensemble-trends-pr-evspsbl.ipynb [4], ensemble-trends-prra-prsn.ipynb [4])
 8. Evaporation/precipitation ratio, regional seasonal trends (ensemble-evspsbl.ipynb [9])
-9. Spatial correlation of evaporation and sea ice concentration (analysis/analysis-spatial-siconc.ipynb [9])
+9. Seasonal spatial correlation of evaporation and sea ice concentration (analysis/analysis-spatial-siconc.ipynb [9])
 10. Evaporation/precipitation ratio, 2080-2100 average seasonal cycle (ensemble-regional-trends.ipynb [13])
-11. Inter-model correlation of sea ice area and evaporation/precipitation ratio for 2080-2100 average seasonal cycle ()
-12. Contribution of evaporation from sea ice loss to total evaporation and precipitation ()
+11. Inter-model & ensemble mean correlation of sea ice area and E/P for 2080-2100 average seasonal cycle (ensemble-evspsbl.ipynb [16])
+12. Contribution of evaporation from sea ice loss to total evaporation and precipitation (ensemble-trends-pr-evspsbl-siconc.ipynb [9, 10])
+13. Rainfall season length (ensemble-prra-prsn.ipynb [10])
+14. Ensemble mean seasonal cycle of prra/pr (ensemble-prra-prsn.ipynb [8])
+15. Ensemble mean seasonal cycle & spread of melt pond concentration (ensemble-simpconc.ipynb [8, 10])
 
 
 ## Stats
@@ -27,6 +30,7 @@ Codebase for dissertation project which aims to investigate the effect of rainfa
 - Precipitation & evaporation changes (ensemble-trends-pr-evspsbl.ipynb [5])
 - Rainfall & snowfall changes (ensemble-trends-prra-prsn.ipynb [5, 6])
 - Spatial correlation of evaporation and sea ice concentration (analysis/analysis-spatial-siconc.ipynb [10, 11])
+- Precipitation and evaporation as a result of sea ice decline (ensemble-trends-pr-evspsbl-siconc.ipynb [14])
 
 
 ## Setup
